@@ -14,7 +14,7 @@ export async function generateText(
 ): Promise<string> {
 	try {
 		const res = await lunos.responses.create({
-			model: "openai/gpt-5-nano",
+			model: "gpt-4o-mini",
 			input: prompt,
 			temperature,
 		} as any);
@@ -28,7 +28,7 @@ export async function generateText(
 	} catch (e: any) {
 		if (e?.status === 400 || e?.status === 404) {
 			const chat = await lunos.chat.completions.create({
-				model: "openai/gpt-5-nano",
+				model: "gpt-4o-mini",
 				messages: [{ role: "user", content: prompt }],
 				temperature,
 			});
