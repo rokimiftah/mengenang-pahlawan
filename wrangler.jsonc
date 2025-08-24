@@ -1,0 +1,9 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "mengenang-pahlawan",
+	"compatibility_date": "2025-08-01",
+	"assets": {
+		"directory": "./dist",
+		"html_handling": "drop-trailing-slash",
+	},
+}
