@@ -140,10 +140,10 @@ export function HeroGrid() {
 						onClick={() => {
 							if (document.startViewTransition) {
 								document.startViewTransition(() =>
-									navigate(`/dashboard/hero/${h.slug}`),
+									navigate(`/pahlawan/${h.slug}`),
 								);
 							} else {
-								navigate(`/dashboard/hero/${h.slug}`);
+								navigate(`/pahlawan/${h.slug}`);
 							}
 						}}
 					/>

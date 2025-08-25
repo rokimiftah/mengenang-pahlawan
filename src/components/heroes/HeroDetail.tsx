@@ -183,7 +183,7 @@ function RecommendPanel({
 								key={h.slug}
 								type="button"
 								onClick={() => {
-									navigate(`/dashboard/hero/${h.slug}`);
+									navigate(`/pahlawan/${h.slug}`);
 									onClose();
 								}}
 								className="group cursor-pointer overflow-hidden rounded-lg border border-zinc-200 p-3 text-left transition hover:border-zinc-300 hover:bg-zinc-50 active:bg-zinc-100"
@@ -621,7 +621,7 @@ function QuizModal({
 
 export function HeroDetail() {
 	const [, _navigate] = useLocation();
-	const [, params] = useRoute<{ slug: string }>("/dashboard/hero/:slug");
+	const [, params] = useRoute<{ slug: string }>("/pahlawan/:slug");
 	const [chatOpen, setChatOpen] = useState(false);
 
 	const hero = useQuery(
@@ -728,14 +728,14 @@ export function HeroDetail() {
 			<div className="mb-4 flex items-center">
 				<Breadcrumbs>
 					<Anchor
-						href="/dashboard"
+						href="/pahlawan"
 						onClick={(e) => {
 							e.preventDefault();
-							navigate("/dashboard");
+							navigate("/pahlawan");
 						}}
 						className="text-neutral-400 no-underline"
 					>
-						Dashboard
+						Pahlawan
 					</Anchor>
 					<span className="text-neutral-400">
 						{hero?.name ?? "Detail Pahlawan"}

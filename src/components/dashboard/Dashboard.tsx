@@ -35,7 +35,7 @@ function HeaderSearchSlot() {
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
 	const [open, setOpen] = useState(false);
-	const [isDetail] = useRoute<{ slug: string }>("/dashboard/hero/:slug");
+	const [isDetail] = useRoute<{ slug: string }>("/pahlawan/:slug");
 
 	return (
 		<>

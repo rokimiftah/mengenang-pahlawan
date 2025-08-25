@@ -106,7 +106,7 @@ export function UserMenu() {
 								try {
 									await signOut();
 								} finally {
-									navigate("/dashboard", { replace: true });
+									navigate("/pahlawan", { replace: true });
 								}
 							})();
 						}}

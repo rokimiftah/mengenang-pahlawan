@@ -80,10 +80,10 @@ export const Home = () => {
 	const goToDashboard = () => {
 		if (document.startViewTransition) {
 			document.startViewTransition(() => {
-				navigate("/dashboard");
+				navigate("/pahlawan");
 			});
 		} else {
-			navigate("/dashboard");
+			navigate("/pahlawan");
 		}
 	};
 

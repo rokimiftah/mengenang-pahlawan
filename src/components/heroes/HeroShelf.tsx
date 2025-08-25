@@ -164,9 +164,7 @@ export function HeroShelf() {
 			prevEraRef.current = era;
 			const st = readStored();
 			const p =
-				typeof st?.pageByEra?.[era] === "number"
-					? st.pageByEra[era]
-					: 0;
+				typeof st?.pageByEra?.[era] === "number" ? st.pageByEra[era] : 0;
 			setPage(p);
 		}
 	}, [era]);
@@ -241,19 +239,16 @@ export function HeroShelf() {
 										<div
 											className="grid h-full min-h-0 w-full grid-cols-3"
 											style={{
-												gridTemplateRows:
-													"minmax(0,1fr)",
+												gridTemplateRows: "minmax(0,1fr)",
 												gap: "16px",
 											}}
 										>
-											{Array.from({ length: COLS }).map(
-												(_, i) => (
-													<div
-														key={i}
-														className="h-full min-h-0 animate-pulse rounded-2xl bg-zinc-800/70"
-													/>
-												),
-											)}
+											{Array.from({ length: COLS }).map((_, i) => (
+												<div
+													key={i}
+													className="h-full min-h-0 animate-pulse rounded-2xl bg-zinc-800/70"
+												/>
+											))}
 										</div>
 									</div>
 								)}
@@ -261,15 +256,11 @@ export function HeroShelf() {
 								{heroes !== undefined &&
 									(pages.length ? (
 										pages.map((group, idx) => (
-											<div
-												key={idx}
-												className="h-full min-h-0 w-full shrink-0"
-											>
+											<div key={idx} className="h-full min-h-0 w-full shrink-0">
 												<div
 													className="grid h-full min-h-0 w-full grid-cols-3"
 													style={{
-														gridTemplateRows:
-															"minmax(0,1fr)",
+														gridTemplateRows: "minmax(0,1fr)",
 														gap: "16px",
 													}}
 												>
@@ -278,32 +269,20 @@ export function HeroShelf() {
 															key={h.slug}
 															hero={h}
 															onClick={() => {
-																writeStored(
-																	era,
-																	page,
-																);
-																if (
-																	document.startViewTransition
-																) {
-																	document.startViewTransition(
-																		() =>
-																			navigate(
-																				`/dashboard/hero/${h.slug}`,
-																			),
+																writeStored(era, page);
+																if (document.startViewTransition) {
+																	document.startViewTransition(() =>
+																		navigate(`/pahlawan/${h.slug}`),
 																	);
 																} else {
-																	navigate(
-																		`/dashboard/hero/${h.slug}`,
-																	);
+																	navigate(`/pahlawan/${h.slug}`);
 																}
 															}}
 														/>
 													))}
 													{group.length < COLS &&
 														Array.from({
-															length:
-																COLS -
-																group.length,
+															length: COLS - group.length,
 														}).map((_, i) => (
 															<div
 																key={`f-${i}`}
@@ -318,8 +297,7 @@ export function HeroShelf() {
 											<div
 												className="grid h-full min-h-0 w-full grid-cols-3"
 												style={{
-													gridTemplateRows:
-														"minmax(0,1fr)",
+													gridTemplateRows: "minmax(0,1fr)",
 													gap: "16px",
 												}}
 											>
@@ -341,11 +319,7 @@ export function HeroShelf() {
 
 						<SideArrow
 							dir="right"
-							onClick={() =>
-								setPage((p) =>
-									Math.min(pages.length - 1, p + 1),
-								)
-							}
+							onClick={() => setPage((p) => Math.min(pages.length - 1, p + 1))}
 							disabled={!canNext}
 						/>
 					</div>

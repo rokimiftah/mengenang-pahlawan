@@ -104,7 +104,7 @@ export function AuthenticationForm() {
 		setIsLoading(true);
 		setError(null);
 		try {
-			await signIn("github", { redirectTo: "/dashboard" });
+			await signIn("github", { redirectTo: "/pahlawan" });
 		} catch (error: unknown) {
 			const errorMessage =
 				error instanceof ConvexError

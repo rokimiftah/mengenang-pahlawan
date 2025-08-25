@@ -24,8 +24,8 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 				<Router base="/">
 					<Switch>
 						<Route path="/" component={Home} />
-						<Route path="/dashboard" component={DashboardHome} />
-						<Route path="/dashboard/hero/:slug" component={DashboardHero} />
+						<Route path="/pahlawan" component={DashboardHome} />
+						<Route path="/pahlawan/:slug" component={DashboardHero} />
 						<Route>
 							<Redirect to="/" />
 						</Route>
