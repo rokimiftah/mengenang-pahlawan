@@ -84,9 +84,7 @@ async function decoyBank(ctx: any, exceptSlug: string) {
 		highlights: others
 			.flatMap(
 				(h: any) =>
-					h?.raw?.biography?.highlights ??
-					h?.biography?.highlights ??
-					[],
+					h?.raw?.biography?.highlights ?? h?.biography?.highlights ?? [],
 			)
 			.filter(Boolean) as string[],
 	};
@@ -150,9 +148,10 @@ function buildQuestions(
 
 	const basis = s(hero?.recognition?.basis);
 	if (basis) {
-		const decoys = shuffle(
-			bank.recognitions.filter((b) => b !== basis),
-		).slice(0, 2);
+		const decoys = shuffle(bank.recognitions.filter((b) => b !== basis)).slice(
+			0,
+			2,
+		);
 		const options = shuffle([opt(basis), ...decoys.map(opt)]);
 		if (options.length === 3) {
 			out.push({
@@ -173,9 +172,10 @@ function buildQuestions(
 	if (hl.length > 0) {
 		const truth = s(hl[0]);
 		if (truth) {
-			const decoys = shuffle(
-				bank.highlights.filter((h) => h !== truth),
-			).slice(0, 2);
+			const decoys = shuffle(bank.highlights.filter((h) => h !== truth)).slice(
+				0,
+				2,
+			);
 			const options = shuffle([opt(truth), ...decoys.map(opt)]);
 			out.push({
 				id: cryptoRandomId(),
@@ -241,9 +241,7 @@ export const recordAttempt = mutation({
 		const day = todaySG();
 		let daily = await ctx.db
 			.query("quizDaily")
-			.withIndex("by_user_day", (q) =>
-				q.eq("userId", userId).eq("day", day),
-			)
+			.withIndex("by_user_day", (q) => q.eq("userId", userId).eq("day", day))
 			.first();
 
 		if (!daily) {
@@ -324,8 +322,7 @@ export const recordAttempt = mutation({
 		try {
 			const user = await ctx.db.get(userId);
 			const email = (user as any)?.email as string | undefined;
-			const userName: string | null =
-				((user as any)?.name as string) ?? null;
+			const userName: string | null = ((user as any)?.name as string) ?? null;
 
 			if (email) {
 				const hero = await ctx.db
@@ -334,20 +331,16 @@ export const recordAttempt = mutation({
 					.first();
 				const heroName = hero?.name ?? slug;
 
-				await ctx.scheduler.runAfter(
-					0,
-					internal.quizzes._sendQuizResultEmail,
-					{
-						email,
-						userName: userName ?? undefined,
-						heroName,
-						total,
-						correct,
-						awarded,
-						practice: alreadyHeroToday || reachedDailyCap,
-						breakdown,
-					},
-				);
+				await ctx.scheduler.runAfter(0, internal.quizzes._sendQuizResultEmail, {
+					email,
+					userName: userName ?? undefined,
+					heroName,
+					total,
+					correct,
+					awarded,
+					practice: alreadyHeroToday || reachedDailyCap,
+					breakdown,
+				});
 			}
 		} catch {
 			// ignore

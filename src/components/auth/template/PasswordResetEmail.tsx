@@ -28,15 +28,14 @@ export function PasswordResetEmail({
 					<Section style={contentSection}>
 						<Heading style={h1}>Reset Password Anda</Heading>
 						<Text style={mainText}>
-							Hai! Gunakan kode di bawah ini untuk mengatur ulang
-							kata sandi Anda.
+							Hai! Gunakan kode di bawah ini untuk mengatur ulang kata sandi
+							Anda.
 						</Text>
 						<Section style={verificationSection}>
 							<Text style={verifyText}>Kode Verifikasi</Text>
 							<Text style={codeText}>{code}</Text>
 							<Text style={validityText}>
-								Kode ini akan kedaluwarsa dalam{" "}
-								{minutesUntilExpiry} menit.
+								Kode ini akan kedaluwarsa dalam {minutesUntilExpiry} menit.
 							</Text>
 						</Section>
 						<Text style={smallText}>

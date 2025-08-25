@@ -26,8 +26,7 @@ export function PointsHistoryModal({
 	const rows = useQuery(api.points.getAwards, { limit: 20 });
 
 	const totalEarned = useMemo(
-		() =>
-			(rows ?? []).reduce((a: number, r: any) => a + (r.points || 0), 0),
+		() => (rows ?? []).reduce((a: number, r: any) => a + (r.points || 0), 0),
 		[rows],
 	);
 
@@ -46,10 +45,7 @@ export function PointsHistoryModal({
 				<Text size="sm" c="dimmed">
 					Menampilkan {rows?.length ?? 0} aktivitas terakhir
 				</Text>
-				<Badge
-					variant="gradient"
-					gradient={{ from: "yellow", to: "orange" }}
-				>
+				<Badge variant="gradient" gradient={{ from: "yellow", to: "orange" }}>
 					+{totalEarned} poin baru-baru ini
 				</Badge>
 			</Group>
@@ -77,9 +73,7 @@ export function PointsHistoryModal({
 							<Table.Td>{formatDT(r.createdAt)}</Table.Td>
 							<Table.Td>{r.heroName}</Table.Td>
 
-							<Table.Td
-								style={{ width: 120, whiteSpace: "nowrap" }}
-							>
+							<Table.Td style={{ width: 120, whiteSpace: "nowrap" }}>
 								{r.practice ? (
 									<Badge
 										color="gray"
@@ -93,12 +87,7 @@ export function PointsHistoryModal({
 										Latihan
 									</Badge>
 								) : (
-									<Badge
-										color="yellow"
-										variant="light"
-										radius="md"
-										size="md"
-									>
+									<Badge color="yellow" variant="light" radius="md" size="md">
 										Berbobot
 									</Badge>
 								)}

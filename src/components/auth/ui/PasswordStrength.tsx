@@ -74,13 +74,7 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
 									? 100
 									: 0
 						}
-						color={
-							strength > 80
-								? "teal"
-								: strength > 50
-									? "yellow"
-									: "red"
-						}
+						color={strength > 80 ? "teal" : strength > 50 ? "yellow" : "red"}
 						key={index}
 						size={4}
 					/>

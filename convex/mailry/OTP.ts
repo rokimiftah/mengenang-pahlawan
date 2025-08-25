@@ -37,7 +37,7 @@ export const OTP = Email({
 		);
 
 		const text = `
-            Terima kasih telah memulai pembuatan akun. Kami ingin memastikan itu benar-benar Anda. Harap masukkan kode verifikasi berikut: ${token}.
+			Terima kasih telah memulai pembuatan akun. Kami ingin memastikan itu benar-benar Anda. Harap masukkan kode verifikasi berikut: ${token}.
 			Jangan bagikan kode ini kepada siapa pun. Kode berlaku ${minutesUntilExpiry} menit.
 			Jika Anda tidak merasa meminta kode, abaikan email ini.
 		`;

@@ -80,8 +80,7 @@ function Choice({
 }) {
 	const base =
 		"w-full text-left rounded-lg border px-3 py-2 text-sm transition cursor-pointer text-neutral-600";
-	const normal =
-		"bg-white border-zinc-200 hover:bg-zinc-50 active:bg-zinc-100";
+	const normal = "bg-white border-zinc-200 hover:bg-zinc-50 active:bg-zinc-100";
 	const sel = "bg-yellow-100 border-yellow-300";
 	const ok = "bg-green-100 border-green-300";
 	const bad = "bg-rose-100 border-rose-300";
@@ -126,9 +125,7 @@ function RecommendPanel({
 			try {
 				let recent: string[] = [];
 				try {
-					recent = JSON.parse(
-						localStorage.getItem("recent-slugs") || "[]",
-					);
+					recent = JSON.parse(localStorage.getItem("recent-slugs") || "[]");
 				} catch {}
 				const resp = await recommend({
 					currentSlug: slug,
@@ -165,10 +162,7 @@ function RecommendPanel({
 				{loading && (
 					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
 						{Array.from({ length: 6 }).map((_, i) => (
-							<div
-								key={i}
-								className="rounded-lg border border-zinc-200 p-3"
-							>
+							<div key={i} className="rounded-lg border border-zinc-200 p-3">
 								<div className="mb-2 h-28 w-full animate-pulse rounded bg-zinc-200" />
 								<div className="h-4 w-2/3 animate-pulse rounded bg-zinc-200" />
 							</div>
@@ -208,11 +202,7 @@ function RecommendPanel({
 								<div className="line-clamp-1 text-sm font-semibold text-zinc-900">
 									{h.name}
 								</div>
-								{h.era && (
-									<div className="text-xs text-zinc-500">
-										{h.era}
-									</div>
-								)}
+								{h.era && <div className="text-xs text-zinc-500">{h.era}</div>}
 							</button>
 						))}
 					</div>
@@ -318,10 +308,7 @@ function ChatRoleplayPanel({
 								: "self-end bg-yellow-100 text-zinc-900 ring-1 ring-yellow-200",
 						].join(" ")}
 						style={{
-							alignSelf:
-								m.role === "assistant"
-									? "flex-start"
-									: "flex-end",
+							alignSelf: m.role === "assistant" ? "flex-start" : "flex-end",
 						}}
 					>
 						{m.content}
@@ -455,9 +442,7 @@ function QuizPanel({ slug, onClose }: { slug: string; onClose: () => void }) {
 	return (
 		<div className="flex h-[560px] max-h-[85vh] w-[640px] max-w-[95vw] flex-col overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/10">
 			<div className="flex items-center gap-3 border-b px-4 py-3">
-				<h3 className="text-base font-semibold text-zinc-900">
-					Kuis Pahlawan
-				</h3>
+				<h3 className="text-base font-semibold text-zinc-900">Kuis Pahlawan</h3>
 			</div>
 
 			<div className="min-h-0 flex-1 overflow-y-auto p-4">
@@ -517,8 +502,8 @@ function QuizPanel({ slug, onClose }: { slug: string; onClose: () => void }) {
 							<div className="mx-auto w-full max-w-md rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900 ring-1 ring-amber-200">
 								{award.practice ? (
 									<div>
-										Mode latihan — tidak ada poin (kuota
-										harian/hero sudah terpakai).
+										Mode latihan — tidak ada poin (kuota harian/hero sudah
+										terpakai).
 									</div>
 								) : (
 									<div className="space-y-1">
@@ -533,8 +518,7 @@ function QuizPanel({ slug, onClose }: { slug: string; onClose: () => void }) {
 												.join(", ")}
 										</div>
 										<div className="text-xs text-amber-800/80">
-											Sisa kuis berbobot hari ini:{" "}
-											{award.dailyRemaining}
+											Sisa kuis berbobot hari ini: {award.dailyRemaining}
 										</div>
 									</div>
 								)}
@@ -543,13 +527,9 @@ function QuizPanel({ slug, onClose }: { slug: string; onClose: () => void }) {
 
 						<div className="mx-auto w-full max-w-md rounded-md bg-blue-50 px-3 py-2 text-sm text-blue-900 ring-1 ring-blue-200">
 							Ringkasan hasil kuis telah{" "}
-							<span className="font-semibold">
-								dikirim ke email
-							</span>{" "}
-							Anda.
+							<span className="font-semibold">dikirim ke email</span> Anda.
 							<span className="mt-1 block text-xs text-blue-800/80">
-								Jika belum terlihat, periksa folder
-								Spam/Promosi.
+								Jika belum terlihat, periksa folder Spam/Promosi.
 							</span>
 						</div>
 					</div>
@@ -568,10 +548,7 @@ function QuizPanel({ slug, onClose }: { slug: string; onClose: () => void }) {
 					<Button
 						className="cursor-pointer bg-yellow-400 text-black hover:bg-yellow-300 disabled:cursor-not-allowed"
 						onClick={next}
-						disabled={
-							!quiz.questions[idx] ||
-							!picked[quiz.questions[idx].id]
-						}
+						disabled={!quiz.questions[idx] || !picked[quiz.questions[idx].id]}
 					>
 						{idx < quiz.questions.length - 1 ? "Lanjut" : "Selesai"}
 					</Button>
@@ -684,9 +661,7 @@ export function HeroDetail() {
 	};
 
 	const bioSummary: string | undefined =
-		hero?.biography?.summary ??
-		hero?.raw?.biography?.summary ??
-		hero?.summary;
+		hero?.biography?.summary ?? hero?.raw?.biography?.summary ?? hero?.summary;
 
 	const bioHighlights: string[] =
 		hero?.biography?.highlights ?? hero?.raw?.biography?.highlights ?? [];
@@ -700,13 +675,11 @@ export function HeroDetail() {
 		if (!hero?.slug) return;
 		try {
 			const key = "recent-slugs";
-			const cur = JSON.parse(
-				localStorage.getItem(key) || "[]",
-			) as string[];
-			const next = [
-				hero.slug,
-				...cur.filter((s) => s !== hero.slug),
-			].slice(0, 10);
+			const cur = JSON.parse(localStorage.getItem(key) || "[]") as string[];
+			const next = [hero.slug, ...cur.filter((s) => s !== hero.slug)].slice(
+				0,
+				10,
+			);
 			localStorage.setItem(key, JSON.stringify(next));
 		} catch {}
 	}, [hero?.slug]);
@@ -717,13 +690,11 @@ export function HeroDetail() {
 		if (!hero?.slug) return;
 		try {
 			const key = "recent-slugs";
-			const cur = JSON.parse(
-				localStorage.getItem(key) || "[]",
-			) as string[];
-			const next = [
-				hero.slug,
-				...cur.filter((s) => s !== hero.slug),
-			].slice(0, 10);
+			const cur = JSON.parse(localStorage.getItem(key) || "[]") as string[];
+			const next = [hero.slug, ...cur.filter((s) => s !== hero.slug)].slice(
+				0,
+				10,
+			);
 			localStorage.setItem(key, JSON.stringify(next));
 		} catch {}
 	}, [hero?.slug]);
@@ -807,12 +778,7 @@ export function HeroDetail() {
 								: "cursor-pointer hover:bg-black/70",
 						].join(" ")}
 					>
-						<svg
-							width="18"
-							height="18"
-							viewBox="0 0 24 24"
-							fill="none"
-						>
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
 							<path
 								d="M15 18l-6-6 6-6"
 								stroke="currentColor"
@@ -835,12 +801,7 @@ export function HeroDetail() {
 								: "cursor-pointer hover:bg-black/70",
 						].join(" ")}
 					>
-						<svg
-							width="18"
-							height="18"
-							viewBox="0 0 24 24"
-							fill="none"
-						>
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
 							<path
 								d="M9 6l6 6-6 6"
 								stroke="currentColor"
@@ -871,9 +832,7 @@ export function HeroDetail() {
 				</div>
 				<div className="relative col-span-1 flex min-h-0 flex-col rounded-2xl bg-white p-4 md:col-span-3">
 					<div className="mb-2 flex items-start justify-between gap-3">
-						<h2 className="text-xl font-semibold text-zinc-900">
-							{hero.name}
-						</h2>
+						<h2 className="text-xl font-semibold text-zinc-900">{hero.name}</h2>
 						<div className="flex items-center gap-2">
 							<Button
 								size="sm"
@@ -883,9 +842,7 @@ export function HeroDetail() {
 										text: bioSummary ?? "",
 										maxSentences: 3,
 									} as any);
-									setStudentView(
-										(res as any)?.summary || null,
-									);
+									setStudentView((res as any)?.summary || null);
 								}}
 							>
 								Ringkas (Pelajar)
@@ -913,9 +870,7 @@ export function HeroDetail() {
 						))}
 						{Array.isArray(hero.raw?.aliases) &&
 							hero.raw.aliases.length > 0 && (
-								<AliasBadge
-									text={`Alias: ${hero.raw.aliases.join(", ")}`}
-								/>
+								<AliasBadge text={`Alias: ${hero.raw.aliases.join(", ")}`} />
 							)}
 					</div>
 
@@ -1053,16 +1008,10 @@ export function HeroDetail() {
 					</button>
 				</div>
 				<QuizModal open={quizOpen} onClose={() => setQuizOpen(false)}>
-					<QuizPanel
-						slug={hero.slug}
-						onClose={() => setQuizOpen(false)}
-					/>
+					<QuizPanel slug={hero.slug} onClose={() => setQuizOpen(false)} />
 				</QuizModal>
 				<QuizModal open={recsOpen} onClose={() => setRecsOpen(false)}>
-					<RecommendPanel
-						slug={hero.slug}
-						onClose={() => setRecsOpen(false)}
-					/>
+					<RecommendPanel slug={hero.slug} onClose={() => setRecsOpen(false)} />
 				</QuizModal>
 				<QuizModal open={chatOpen} onClose={() => setChatOpen(false)}>
 					<ChatRoleplayPanel

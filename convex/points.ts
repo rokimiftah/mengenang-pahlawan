@@ -28,9 +28,7 @@ export const getSummary = query({
 		const day = todayID();
 		const daily = await ctx.db
 			.query("quizDaily")
-			.withIndex("by_user_day", (q) =>
-				q.eq("userId", userId).eq("day", day),
-			)
+			.withIndex("by_user_day", (q) => q.eq("userId", userId).eq("day", day))
 			.first();
 
 		const scored = daily?.scoredCount ?? 0;

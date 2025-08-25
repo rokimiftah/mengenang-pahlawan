@@ -100,8 +100,7 @@ export function HeroGrid() {
 			const sW = (W - GAP * (c - 1)) / c;
 			const sH = (H - GAP * (rows - 1)) / rows;
 			const s = Math.min(sW, sH, MAX);
-			if (s > best.size && Number.isFinite(s))
-				best = { cols: c, size: s };
+			if (s > best.size && Number.isFinite(s)) best = { cols: c, size: s };
 		}
 
 		if (best.size <= 0 || !Number.isFinite(best.size)) {
@@ -119,8 +118,7 @@ export function HeroGrid() {
 		return { cols: best.cols, size: Math.floor(best.size), gap: GAP };
 	}, [box.w, box.h, heroes?.length]);
 
-	if (heroes === undefined)
-		return <div className="text-zinc-400">Memuat…</div>;
+	if (heroes === undefined) return <div className="text-zinc-400">Memuat…</div>;
 	if (!heroes.length)
 		return <div className="text-zinc-400">Belum ada data pahlawan.</div>;
 

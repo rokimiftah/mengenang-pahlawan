@@ -43,26 +43,14 @@ export function PointsBadge({
 			<div className="mb-1 flex items-center gap-2">
 				<svg aria-hidden viewBox="0 0 24 24" className="h-4 w-4">
 					<defs>
-						<linearGradient
-							id="coinGrad"
-							x1="0"
-							y1="0"
-							x2="1"
-							y2="1"
-						>
+						<linearGradient id="coinGrad" x1="0" y1="0" x2="1" y2="1">
 							<stop offset="0%" stopColor="#FDE68A" />
 							<stop offset="50%" stopColor="#F59E0B" />
 							<stop offset="100%" stopColor="#D97706" />
 						</linearGradient>
 					</defs>
 					<circle cx="12" cy="12" r="10" fill="url(#coinGrad)" />
-					<circle
-						cx="12"
-						cy="12"
-						r="7"
-						fill="#fff7ed"
-						opacity="0.5"
-					/>
+					<circle cx="12" cy="12" r="7" fill="#fff7ed" opacity="0.5" />
 					<path
 						d="M9 14h6M9 10h6"
 						stroke="#7c2d12"
@@ -70,9 +58,7 @@ export function PointsBadge({
 						strokeLinecap="round"
 					/>
 				</svg>
-				<div className="text-sm font-bold">
-					Total Poin: {nf.format(total)}
-				</div>
+				<div className="text-sm font-bold">Total Poin: {nf.format(total)}</div>
 			</div>
 			<div className="text-xs text-zinc-200/90">
 				Sisa kuis berbobot hari ini:{" "}
@@ -119,26 +105,14 @@ export function PointsBadge({
 					className="h-[14px] w-[14px] drop-shadow-sm"
 				>
 					<defs>
-						<linearGradient
-							id="coinGrad"
-							x1="0"
-							y1="0"
-							x2="1"
-							y2="1"
-						>
+						<linearGradient id="coinGrad" x1="0" y1="0" x2="1" y2="1">
 							<stop offset="0%" stopColor="#FDE68A" />
 							<stop offset="50%" stopColor="#F59E0B" />
 							<stop offset="100%" stopColor="#D97706" />
 						</linearGradient>
 					</defs>
 					<circle cx="12" cy="12" r="10" fill="url(#coinGrad)" />
-					<circle
-						cx="12"
-						cy="12"
-						r="7"
-						fill="#fff7ed"
-						opacity="0.5"
-					/>
+					<circle cx="12" cy="12" r="7" fill="#fff7ed" opacity="0.5" />
 					<path
 						d="M9 14h6M9 10h6"
 						stroke="#7c2d12"
@@ -148,10 +122,7 @@ export function PointsBadge({
 				</svg>
 
 				<span
-					className={clsx(
-						"tracking-wide tabular-nums",
-						pop && "scale-105",
-					)}
+					className={clsx("tracking-wide tabular-nums", pop && "scale-105")}
 				>
 					{loading ? "…" : compact(total)}
 				</span>

@@ -56,25 +56,24 @@ export const recommendHeroes = action({
 			.join("\n");
 
 		const prompt = `
-            Kamu adalah kurator sejarah. Pilih ${limit} rekomendasi pahlawan
-            untuk user yang sedang melihat "${currentSlug}".
-            Pertimbangkan kemiripan era/tema/relasi, dan variasi yang menarik.
-            Riwayat user (terbaru duluan): ${recentSlugs.join(", ") || "(kosong)"}.
+			Kamu adalah kurator sejarah. Pilih ${limit} rekomendasi pahlawan
+			untuk user yang sedang melihat "${currentSlug}".
+			Pertimbangkan kemiripan era/tema/relasi, dan variasi yang menarik.
+			Riwayat user (terbaru duluan): ${recentSlugs.join(", ") || "(kosong)"}.
 
-            Daftar kandidat:
-            ${lines}
+			Daftar kandidat:
+			${lines}
 
-            Kembalikan JSON ketat:
-            {"slugs":["slug1","slug2","slug3"]}
-                `.trim();
+			Kembalikan JSON ketat:
+			{"slugs":["slug1","slug2","slug3"]}
+		`.trim();
 
 		const out = await generateTextUnli(prompt, 0.2);
 
 		let picks: string[] = [];
 		try {
 			const j = JSON.parse(out);
-			if (Array.isArray(j?.slugs))
-				picks = j.slugs.map((s: any) => String(s));
+			if (Array.isArray(j?.slugs)) picks = j.slugs.map((s: any) => String(s));
 		} catch {
 			const m = out.match(/\{[\s\S]*\}/);
 			if (m) {
@@ -93,9 +92,7 @@ export const recommendHeroes = action({
 		}
 
 		const pickSet = new Set(picks);
-		const recs = candidates
-			.filter((h) => pickSet.has(h.slug))
-			.slice(0, limit);
+		const recs = candidates.filter((h) => pickSet.has(h.slug)).slice(0, limit);
 
 		return { recs };
 	},
@@ -124,34 +121,34 @@ export const chatAsHero = action({
 		const q = (message ?? "").trim();
 		if (!q) {
 			return {
-				reply: "Ini simulasi edukatif berdasarkan sumber yang ada.\n[Fakta] — Pertanyaan kosong.\n[Interpretasi] — Silakan ajukan pertanyaan terkait pahlawan ini.",
+				reply:
+					"Ini simulasi edukatif berdasarkan sumber yang ada.\n[Fakta] — Pertanyaan kosong.\n[Interpretasi] — Silakan ajukan pertanyaan terkait pahlawan ini.",
 			};
 		}
 
 		const judgePrompt = `
-            Tentukan apakah pertanyaan pengguna RELEVAN dengan pahlawan berikut.
-            Balas JSON ketat:
-            {"relevant": true|false, "reason": "singkat"}
+			Tentukan apakah pertanyaan pengguna RELEVAN dengan pahlawan berikut.
+			Balas JSON ketat:
+			{"relevant": true|false, "reason": "singkat"}
 
-            [PAHLAWAN]
-            Nama: ${hero.name}
-            Ringkasan: ${summary}
-            Sorotan: ${highlights}
+			[PAHLAWAN]
+			Nama: ${hero.name}
+			Ringkasan: ${summary}
+			Sorotan: ${highlights}
 
-            [PERTANYAAN]
-            ${q}
+			[PERTANYAAN]
+			${q}
 
-            Kriteria relevan:
-            - tentang kehidupan, perjuangan, era, karya, pengaruh, atau fakta terkait ${hero.name}.
-            - banding/relasi dengan tokoh/sejarah yang masih terkait konteks ${hero.name} juga relevan.
-            Tidak relevan: matematika umum, coding, topik pop culture modern, tokoh lain tanpa kaitan, hal di luar sejarah ${hero.name}.
-            `.trim();
+			Kriteria relevan:
+			- tentang kehidupan, perjuangan, era, karya, pengaruh, atau fakta terkait ${hero.name}.
+			- banding/relasi dengan tokoh/sejarah yang masih terkait konteks ${hero.name} juga relevan.
+			Tidak relevan: matematika umum, coding, topik pop culture modern, tokoh lain tanpa kaitan, hal di luar sejarah ${hero.name}.
+		`.trim();
 
 		const judgeOut = await generateTextUnli(judgePrompt, 0);
-		const judge = safeJson<{ relevant?: boolean; reason?: string }>(
-			judgeOut,
-			{ relevant: true },
-		);
+		const judge = safeJson<{ relevant?: boolean; reason?: string }>(judgeOut, {
+			relevant: true,
+		});
 		if (!judge.relevant) {
 			return {
 				reply:
@@ -163,33 +160,30 @@ export const chatAsHero = action({
 
 		const transcript = (history as ChatMsg[])
 			.slice(-8)
-			.map(
-				(m) =>
-					`${m.role === "user" ? "User" : "Pahlawan"}: ${m.content}`,
-			)
+			.map((m) => `${m.role === "user" ? "User" : "Pahlawan"}: ${m.content}`)
 			.join("\n");
 
 		const prompt = `
-            Kamu mensimulasikan tokoh "${hero.name}" untuk tujuan edukatif.
-            SELALU mulai jawaban dengan: "Ini simulasi edukatif berdasarkan sumber yang ada."
-            Bicara orang pertama (aku/saya) ala era tokoh.
-            JANGAN menambah fakta baru di luar data yang diberikan.
-            Pisahkan dua bagian di jawaban:
-            [Fakta] — poin singkat dari data.
-            [Interpretasi] — gaya bahasa/emosi/penghayatan (jelas sebagai interpretasi).
+			Kamu mensimulasikan tokoh "${hero.name}" untuk tujuan edukatif.
+			SELALU mulai jawaban dengan: "Ini simulasi edukatif berdasarkan sumber yang ada."
+			Bicara orang pertama (aku/saya) ala era tokoh.
+			JANGAN menambah fakta baru di luar data yang diberikan.
+			Pisahkan dua bagian di jawaban:
+			[Fakta] — poin singkat dari data.
+			[Interpretasi] — gaya bahasa/emosi/penghayatan (jelas sebagai interpretasi).
 
-            [DATA]
-            Ringkasan: ${summary}
-            Sorotan: ${highlights}
+			[DATA]
+			Ringkasan: ${summary}
+			Sorotan: ${highlights}
 
-            [TRANSKRIP SEBELUMNYA]
-            ${transcript || "(belum ada percakapan)"}
+			[TRANSKRIP SEBELUMNYA]
+			${transcript || "(belum ada percakapan)"}
 
-            [PERTANYAAN PENGGUNA]
-            ${q}
+			[PERTANYAAN PENGGUNA]
+			${q}
 
-            Batas 4-6 kalimat. Bahasa Indonesia sopan & mudah dipahami.
-            `.trim();
+			Batas 4-6 kalimat. Bahasa Indonesia sopan & mudah dipahami.
+		`.trim();
 
 		const reply = (await generateTextUnli(prompt, 0.7)).trim();
 		return {

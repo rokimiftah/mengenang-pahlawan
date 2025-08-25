@@ -105,9 +105,7 @@ export const importFromJson = mutation({
 
 			const slug = slugify(name);
 			const summary = s(raw?.biography?.summary);
-			const highlights: string[] | undefined = arrS(
-				raw?.biography?.highlights,
-			);
+			const highlights: string[] | undefined = arrS(raw?.biography?.highlights);
 			const era = inferEra(s(raw?.birth?.date));
 			const slides = buildSlides(name, summary, highlights);
 
@@ -183,23 +181,18 @@ export const list = query({
 			if (!tokens.length) return true;
 
 			const combined = norm(
-				[
-					h.name,
-					...(Array.isArray(h?.raw?.aliases) ? h.raw.aliases : []),
-				].join(" "),
+				[h.name, ...(Array.isArray(h?.raw?.aliases) ? h.raw.aliases : [])].join(
+					" ",
+				),
 			);
 
 			return tokens.every((t) => combined.includes(t));
 		});
 
 		filtered.sort((a: any, b: any) => {
-			return String(a.name || "").localeCompare(
-				String(b.name || ""),
-				"id",
-				{
-					sensitivity: "base",
-				},
-			);
+			return String(a.name || "").localeCompare(String(b.name || ""), "id", {
+				sensitivity: "base",
+			});
 		});
 
 		return filtered.slice(0, limit).map((h: any) => ({

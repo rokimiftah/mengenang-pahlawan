@@ -34,7 +34,9 @@ export const simplifySummary = action({
 		_,
 		{ text, maxSentences = 3 },
 	): Promise<{ summary: string }> => {
-		const prompt = `Ringkas teks berikut menjadi ${maxSentences} kalimat, bahasa sederhana (level SMP), tanpa menambah fakta baru:\n\n${text}`;
+		const prompt = `
+			Ringkas teks berikut menjadi ${maxSentences} kalimat, bahasa sederhana (level SMP), tanpa menambah fakta baru:\n\n${text}
+		`;
 		const out = await generateText(prompt, 0.2);
 		return { summary: String(out).trim() };
 	},
@@ -57,14 +59,14 @@ export const generateAiQuiz = action({
 			hero.biography?.highlights ?? hero.raw?.biography?.highlights ?? [];
 
 		const prompt = `
-            Buat ${num} soal pilihan ganda (A/B/C) tentang pahlawan "${hero.name}".
-            Gunakan materi:
-            Ringkasan: ${summary}
-            Sorotan: ${highlights.join(", ")}
+			Buat ${num} soal pilihan ganda (A/B/C) tentang pahlawan "${hero.name}".
+			Gunakan materi:
+			Ringkasan: ${summary}
+			Sorotan: ${highlights.join(", ")}
 
-            Kembalikan JSON ketat:
-            {"questions":[{"prompt":"...","choices":["A ...","B ...","C ..."],"answerIndex":0,"explanation":"..."}]}
-            `.trim();
+			Kembalikan JSON ketat:
+			{"questions":[{"prompt":"...","choices":["A ...","B ...","C ..."],"answerIndex":0,"explanation":"..."}]}
+		`.trim();
 
 		const text = await generateText(prompt, 0.3);
 
@@ -76,9 +78,7 @@ export const generateAiQuiz = action({
 			if (m) parsed = JSON.parse(m[0]);
 		}
 
-		let qs: any[] = Array.isArray(parsed?.questions)
-			? parsed.questions
-			: [];
+		let qs: any[] = Array.isArray(parsed?.questions) ? parsed.questions : [];
 		if (!qs.length) {
 			qs = [
 				{
@@ -97,10 +97,7 @@ export const generateAiQuiz = action({
 					: ["A", "B", "C"];
 				const ans =
 					typeof q?.answerIndex === "number"
-						? Math.max(
-								0,
-								Math.min(choices.length - 1, q.answerIndex),
-							)
+						? Math.max(0, Math.min(choices.length - 1, q.answerIndex))
 						: 0;
 				return {
 					id: `q${i + 1}`,
@@ -110,9 +107,7 @@ export const generateAiQuiz = action({
 						text: t,
 					})),
 					answerId: `q${i + 1}_c${ans}`,
-					explanation: q?.explanation
-						? String(q.explanation)
-						: undefined,
+					explanation: q?.explanation ? String(q.explanation) : undefined,
 				};
 			});
 

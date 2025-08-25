@@ -61,8 +61,7 @@ export function AuthenticationForm() {
 				if (type === "signUp") {
 					if (value.length < 6)
 						return "Password must be at least 6 characters long";
-					if (!/[0-9]/.test(value))
-						return "Password must include a number";
+					if (!/[0-9]/.test(value)) return "Password must include a number";
 					if (!/[a-z]/.test(value))
 						return "Password must include a lowercase letter";
 					if (!/[A-Z]/.test(value))
@@ -85,12 +84,10 @@ export function AuthenticationForm() {
 					: null,
 			newPassword: (value) => {
 				if (type === "reset") {
-					if (value.length === 0)
-						return "New password cannot be empty";
+					if (value.length === 0) return "New password cannot be empty";
 					if (value.length < 6)
 						return "New password must be at least 6 characters long";
-					if (!/[0-9]/.test(value))
-						return "New password must include a number";
+					if (!/[0-9]/.test(value)) return "New password must include a number";
 					if (!/[a-z]/.test(value))
 						return "New password must include a lowercase letter";
 					if (!/[A-Z]/.test(value))
@@ -128,15 +125,10 @@ export function AuthenticationForm() {
 			formData.set("email", normalizedEmail);
 
 			try {
-				if (
-					type === "signIn" ||
-					type === "signUp" ||
-					type === "forgot"
-				) {
-					const userExists = await convex.query(
-						api.users.checkUserExists,
-						{ email: normalizedEmail },
-					);
+				if (type === "signIn" || type === "signUp" || type === "forgot") {
+					const userExists = await convex.query(api.users.checkUserExists, {
+						email: normalizedEmail,
+					});
 
 					if (type === "signIn" && !userExists) {
 						setIsLoading(false);
@@ -145,10 +137,9 @@ export function AuthenticationForm() {
 					}
 
 					if (type === "signIn" && userExists) {
-						const providers = await convex.query(
-							api.users.checkUserProvider,
-							{ email: normalizedEmail },
-						);
+						const providers = await convex.query(api.users.checkUserProvider, {
+							email: normalizedEmail,
+						});
 						if (
 							providers?.includes("github") &&
 							!providers.includes("password")
@@ -201,9 +192,7 @@ export function AuthenticationForm() {
 					if (!isVerified) {
 						setEmail(normalizedEmail);
 						toggle("verify");
-						setError(
-							"Email not verified. Please verify your email",
-						);
+						setError("Email not verified. Please verify your email");
 						setIsLoading(false);
 						return;
 					}
@@ -223,8 +212,8 @@ export function AuthenticationForm() {
 					} catch (verifyError: unknown) {
 						const errorMessage =
 							verifyError instanceof ConvexError
-								? (verifyError.data as { message: string })
-										.message || "Failed to verify email"
+								? (verifyError.data as { message: string }).message ||
+									"Failed to verify email"
 								: "Failed to verify email";
 						setError(errorMessage);
 						setIsLoading(false);
@@ -318,14 +307,11 @@ export function AuthenticationForm() {
 					aria-disabled={isLoading}
 				>
 					<fieldset disabled={isLoading}>
-						{(type === "signIn" ||
-							type === "signUp" ||
-							type === "forgot") && (
+						{(type === "signIn" || type === "signUp" || type === "forgot") && (
 							<>
 								<Group mb="5">
 									<Text size="sm" fw={500}>
-										Email{" "}
-										<span className="text-red-500">*</span>
+										Email <span className="text-red-500">*</span>
 									</Text>
 								</Group>
 								<TextInput
@@ -340,13 +326,11 @@ export function AuthenticationForm() {
 						{(type === "verify" || type === "reset") && email && (
 							<>
 								<Text ta="center" mb="xl">
-									A verification code has been sent to {email}
-									.
+									A verification code has been sent to {email}.
 								</Text>
 								<Group mb="5">
 									<Text size="sm" fw={500}>
-										Verification Code{" "}
-										<span className="text-red-500">*</span>
+										Verification Code <span className="text-red-500">*</span>
 									</Text>
 								</Group>
 								<TextInput
@@ -362,8 +346,7 @@ export function AuthenticationForm() {
 							<>
 								<Group justify="space-between" mb="5" mt="25">
 									<Text size="sm" fw={500}>
-										Password{" "}
-										<span className="text-red-500">*</span>
+										Password <span className="text-red-500">*</span>
 									</Text>
 									<Anchor
 										href="#"
@@ -391,8 +374,7 @@ export function AuthenticationForm() {
 							<>
 								<Group mb="5" mt="25">
 									<Text size="sm" fw={500}>
-										Password{" "}
-										<span className="text-red-500">*</span>
+										Password <span className="text-red-500">*</span>
 									</Text>
 								</Group>
 								<PasswordInput
@@ -403,8 +385,7 @@ export function AuthenticationForm() {
 								/>
 								<Group mb="5" mt="25">
 									<Text size="sm" fw={500}>
-										Confirm Password{" "}
-										<span className="text-red-500">*</span>
+										Confirm Password <span className="text-red-500">*</span>
 									</Text>
 								</Group>
 								<PasswordInput
@@ -413,9 +394,7 @@ export function AuthenticationForm() {
 									aria-label="Confirm password"
 									{...form.getInputProps("confirmPassword")}
 								/>
-								<PasswordStrength
-									password={form.values.password}
-								/>
+								<PasswordStrength password={form.values.password} />
 							</>
 						)}
 
@@ -423,8 +402,7 @@ export function AuthenticationForm() {
 							<>
 								<Group mb="5" mt="25">
 									<Text size="sm" fw={500}>
-										New Password{" "}
-										<span className="text-red-500">*</span>
+										New Password <span className="text-red-500">*</span>
 									</Text>
 								</Group>
 								<PasswordInput
@@ -433,16 +411,11 @@ export function AuthenticationForm() {
 									aria-label="New password"
 									{...form.getInputProps("newPassword")}
 								/>
-								<PasswordStrength
-									password={form.values.newPassword}
-								/>
+								<PasswordStrength password={form.values.newPassword} />
 							</>
 						)}
 
-						<ErrorModalAuth
-							error={error}
-							onClose={() => setError(null)}
-						/>
+						<ErrorModalAuth error={error} onClose={() => setError(null)} />
 
 						<Group justify="space-between" mt="xl">
 							<Anchor

@@ -18,15 +18,12 @@ export function FilterProvider({ children }: { children: React.ReactNode }) {
 	const [filters, setFilters] = useState<Filters>({ q: undefined });
 	const value = useMemo(() => ({ filters, setFilters }), [filters]);
 	return (
-		<FilterContext.Provider value={value}>
-			{children}
-		</FilterContext.Provider>
+		<FilterContext.Provider value={value}>{children}</FilterContext.Provider>
 	);
 }
 
 export function useFilters() {
 	const ctx = useContext(FilterContext);
-	if (!ctx)
-		throw new Error("useFilters must be used within <FilterProvider>");
+	if (!ctx) throw new Error("useFilters must be used within <FilterProvider>");
 	return ctx;
 }

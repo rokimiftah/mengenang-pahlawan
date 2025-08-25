@@ -56,40 +56,28 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 										xmlns="http://www.w3.org/2000/svg"
 									>
 										<defs>
-											<clipPath
-												clipPathUnits="userSpaceOnUse"
-												id="clipPath3"
-											>
+											<clipPath clipPathUnits="userSpaceOnUse" id="clipPath3">
 												<path
 													d="M 0,200 H 200 V 0 H 0 Z"
 													transform="translate(-75.999999,-132.75)"
 													id="path3"
 												/>
 											</clipPath>
-											<clipPath
-												clipPathUnits="userSpaceOnUse"
-												id="clipPath5"
-											>
+											<clipPath clipPathUnits="userSpaceOnUse" id="clipPath5">
 												<path
 													d="M 0,200 H 200 V 0 H 0 Z"
 													transform="translate(-82,-97.556205)"
 													id="path5"
 												/>
 											</clipPath>
-											<clipPath
-												clipPathUnits="userSpaceOnUse"
-												id="clipPath7"
-											>
+											<clipPath clipPathUnits="userSpaceOnUse" id="clipPath7">
 												<path
 													d="M 0,200 H 200 V 0 H 0 Z"
 													transform="translate(-144.25,-83.000002)"
 													id="path7"
 												/>
 											</clipPath>
-											<clipPath
-												clipPathUnits="userSpaceOnUse"
-												id="clipPath9"
-											>
+											<clipPath clipPathUnits="userSpaceOnUse" id="clipPath9">
 												<path
 													d="M 0,200 H 200 V 0 H 0 Z"
 													transform="translate(-130,-83.000002)"
@@ -162,9 +150,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 								</a>
 								<div className="flex items-center gap-2">
 									{!isDetail && <HeaderSearchSlot />}
-									<PointsBadge
-										onClick={() => setOpen(true)}
-									/>
+									<PointsBadge onClick={() => setOpen(true)} />
 									<UserMenu />
 									<PointsHistoryModal
 										opened={open}

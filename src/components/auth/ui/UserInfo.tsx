@@ -26,11 +26,7 @@ export function UserInfo() {
 					{!image && initial}
 				</Avatar>
 				<div className="hidden sm:block">
-					<Text
-						size="sm"
-						c="dimmed"
-						className="max-w-[160px] truncate"
-					>
+					<Text size="sm" c="dimmed" className="max-w-[160px] truncate">
 						{name || email}
 					</Text>
 				</div>

@@ -159,40 +159,28 @@ export const Home = () => {
 								xmlns="http://www.w3.org/2000/svg"
 							>
 								<defs>
-									<clipPath
-										clipPathUnits="userSpaceOnUse"
-										id="clipPath3"
-									>
+									<clipPath clipPathUnits="userSpaceOnUse" id="clipPath3">
 										<path
 											d="M 0,200 H 200 V 0 H 0 Z"
 											transform="translate(-75.999999,-132.75)"
 											id="path3"
 										/>
 									</clipPath>
-									<clipPath
-										clipPathUnits="userSpaceOnUse"
-										id="clipPath5"
-									>
+									<clipPath clipPathUnits="userSpaceOnUse" id="clipPath5">
 										<path
 											d="M 0,200 H 200 V 0 H 0 Z"
 											transform="translate(-82,-97.556205)"
 											id="path5"
 										/>
 									</clipPath>
-									<clipPath
-										clipPathUnits="userSpaceOnUse"
-										id="clipPath7"
-									>
+									<clipPath clipPathUnits="userSpaceOnUse" id="clipPath7">
 										<path
 											d="M 0,200 H 200 V 0 H 0 Z"
 											transform="translate(-144.25,-83.000002)"
 											id="path7"
 										/>
 									</clipPath>
-									<clipPath
-										clipPathUnits="userSpaceOnUse"
-										id="clipPath9"
-									>
+									<clipPath clipPathUnits="userSpaceOnUse" id="clipPath9">
 										<path
 											d="M 0,200 H 200 V 0 H 0 Z"
 											transform="translate(-130,-83.000002)"
@@ -268,8 +256,7 @@ export const Home = () => {
 							className="mt-4 mb-4 inline-flex h-10 w-28 cursor-pointer items-center justify-center rounded-xl bg-red-600 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#C70039] active:bg-[#900020] disabled:cursor-not-allowed disabled:bg-[#900020] sm:h-12 sm:w-32 sm:text-base md:text-lg"
 							onClick={goToDashboard}
 							onKeyDown={(e) => {
-								if (e.key === "Enter" || e.key === " ")
-									goToDashboard();
+								if (e.key === "Enter" || e.key === " ") goToDashboard();
 							}}
 							disabled={isLoading}
 						>

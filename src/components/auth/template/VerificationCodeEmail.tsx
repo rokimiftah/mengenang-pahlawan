@@ -28,16 +28,14 @@ export function VerificationCodeEmail({
 					<Section style={contentSection}>
 						<Heading style={h1}>Verifikasi Alamat Email</Heading>
 						<Text style={mainText}>
-							Terima kasih telah memulai pembuatan akun. Kami
-							ingin memastikan itu benar-benar Anda. Harap
-							masukkan kode verifikasi berikut.
+							Terima kasih telah memulai pembuatan akun. Kami ingin memastikan
+							itu benar-benar Anda. Harap masukkan kode verifikasi berikut.
 						</Text>
 						<Section style={verificationSection}>
 							<Text style={verifyText}>Kode Verifikasi</Text>
 							<Text style={codeText}>{code}</Text>
 							<Text style={validityText}>
-								Kode ini akan kedaluwarsa dalam{" "}
-								{minutesUntilExpiry} menit.
+								Kode ini akan kedaluwarsa dalam {minutesUntilExpiry} menit.
 							</Text>
 						</Section>
 						<Text style={smallText}>
