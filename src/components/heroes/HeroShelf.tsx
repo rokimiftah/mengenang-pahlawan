@@ -1,7 +1,7 @@
 // src/components/heroes/HeroShelf.tsx
 /** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useQuery } from "convex/react";
 import { useLocation } from "wouter";
@@ -79,6 +79,7 @@ function SideArrow({
 function HeroCard({ hero, onClick }: { hero: Hero; onClick: () => void }) {
 	return (
 		<button
+			data-hero-card
 			type="button"
 			onClick={onClick}
 			className="group relative block h-full min-h-0 w-full cursor-pointer overflow-hidden rounded-2xl bg-zinc-900 ring-1 ring-white/10"
@@ -154,10 +155,12 @@ export function HeroShelf() {
 			: 0;
 	const [page, setPage] = useState(storedPage);
 
+	// Simpan posisi
 	useEffect(() => {
 		writeStored(era, page);
 	}, [era, page]);
 
+	// Ganti era -> restore page tersimpan
 	const prevEraRef = useRef(era);
 	useEffect(() => {
 		if (prevEraRef.current !== era) {
@@ -169,18 +172,7 @@ export function HeroShelf() {
 		}
 	}, [era]);
 
-	const restoredAfterLoadRef = useRef(false);
-	useEffect(() => {
-		if (restoredAfterLoadRef.current) return;
-		if (heroes === undefined) return;
-		const st = readStored();
-		const saved =
-			typeof st?.pageByEra?.[era] === "number" ? st.pageByEra[era] : 0;
-		const maxIndex = Math.max(0, pages.length - 1);
-		setPage(clamp(saved, 0, maxIndex));
-		restoredAfterLoadRef.current = true;
-	}, [heroes, era, pages.length]);
-
+	// Setelah heroes siap -> clamp page agar valid
 	useEffect(() => {
 		if (heroes === undefined) return;
 		setPage((p) => clamp(p, 0, Math.max(0, pages.length - 1)));
@@ -188,6 +180,150 @@ export function HeroShelf() {
 
 	const canPrev = page > 0;
 	const canNext = pages.length > 0 && page < pages.length - 1;
+
+	// ---- GESTURE HORIZONTAL (drag + wheel) ----
+	const viewportRef = useRef<HTMLDivElement>(null); // pembungkus yang terlihat
+	const trackRef = useRef<HTMLDivElement>(null); // elemen yang di-transform
+
+	const draggingRef = useRef(false);
+	const startXRef = useRef(0);
+	const startYRef = useRef(0);
+	const startTargetRef = useRef<EventTarget | null>(null);
+	const startTimeRef = useRef(0);
+	const startPageRef = useRef(0);
+	const lastDXRef = useRef(0);
+	const animEnabledRef = useRef(true);
+
+	// Hitung translateX (%) saat dragging
+	const calcTranslatePct = useCallback((p: number, dxPx: number) => {
+		const vp = viewportRef.current;
+		const vw = vp?.clientWidth || 1;
+		const base = p * 100; // setiap halaman = 100%
+		const deltaPct = (dxPx / vw) * 100;
+		return base - deltaPct; // minus karena geser kanan = nilai negatif
+	}, []);
+
+	const setTrackTransform = useCallback(
+		(pageLike: number, dxPx = 0, withTransition = true) => {
+			const el = trackRef.current;
+			if (!el) return;
+			// toggle transition
+			if (withTransition !== animEnabledRef.current) {
+				animEnabledRef.current = withTransition;
+				el.style.transition = withTransition
+					? "transform 300ms ease-out"
+					: "none";
+			}
+			const pct = calcTranslatePct(pageLike, dxPx);
+			el.style.transform = `translateX(-${pct}%)`;
+		},
+		[calcTranslatePct],
+	);
+
+	// Sinkronkan posisi track tiap kali "page" berubah via panah/restore
+	useEffect(() => {
+		setTrackTransform(page, 0, true);
+	}, [page, setTrackTransform]);
+
+	// Init transition style
+	useEffect(() => {
+		const el = trackRef.current;
+		if (el) el.style.transition = "transform 300ms ease-out";
+	}, []);
+
+	// Pointer events (mouse/touch/pen)
+	const onPointerDown = (e: React.PointerEvent) => {
+		if (pages.length <= 1) return; // tidak ada yang digeser
+		draggingRef.current = true;
+		(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+		startXRef.current = e.clientX;
+		startYRef.current = e.clientY;
+		startTargetRef.current = e.target;
+		startTimeRef.current = performance.now();
+		startPageRef.current = page;
+		lastDXRef.current = 0;
+		setTrackTransform(page, 0, false); // matikan anim selama drag
+	};
+
+	const onPointerMove = (e: React.PointerEvent) => {
+		if (!draggingRef.current) return;
+		const dx = e.clientX - startXRef.current; // + ke kanan, - ke kiri
+		lastDXRef.current = dx;
+		setTrackTransform(startPageRef.current, dx, false);
+	};
+
+	const onPointerUp = (e: React.PointerEvent) => {
+		if (!draggingRef.current) return;
+		draggingRef.current = false;
+		(e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+
+		const vp = viewportRef.current;
+		const vw = vp?.clientWidth || 1;
+		const dx = lastDXRef.current;
+		const dy = e.clientY - startYRef.current;
+		const dist = Math.hypot(dx, dy);
+		const duration = performance.now() - startTimeRef.current;
+		const TAP_DIST = 6; // px
+		const TAP_TIME = 350; // ms
+		// Jika tap (bukan drag) → teruskan klik ke tombol/anchor/kartu
+		if (dist <= TAP_DIST && duration <= TAP_TIME) {
+			const startEl = startTargetRef.current as HTMLElement | null;
+			if (startEl) {
+				const clickable = startEl.closest("[data-hero-card],button,a");
+				if (clickable) {
+					// kembalikan posisi track ke halaman aktif (tanpa offset drag)
+					setTrackTransform(page, 0, true);
+					(clickable as HTMLElement).click();
+					return; // jangan proses sebagai drag
+				}
+			}
+		}
+
+		const threshold = vw * 0.2; // 20% layar
+		let next = startPageRef.current;
+
+		if (dx <= -threshold && canNext)
+			next = Math.min(pages.length - 1, startPageRef.current + 1);
+		else if (dx >= threshold && canPrev)
+			next = Math.max(0, startPageRef.current - 1);
+
+		setTrackTransform(next, 0, true);
+		if (next !== page) setPage(next);
+	};
+
+	// Wheel → geser halaman
+	const wheelLastTsRef = useRef(0);
+
+	const onWheel = (e: React.WheelEvent) => {
+		if (pages.length <= 1) return;
+
+		// Cooldown kecil biar nggak lompat 2–3 halaman sekaligus
+		const now = performance.now();
+		const COOLDOWN_MS = 140; // kecil = lebih responsif
+		if (now - wheelLastTsRef.current < COOLDOWN_MS) return;
+
+		// Normalisasi delta (pixel / line / page)
+		const unit =
+			e.deltaMode === 1
+				? 16 // 1 "line" ≈ 16px
+				: e.deltaMode === 2
+					? viewportRef.current?.clientHeight || 800 // 1 "page"
+					: 1; // pixels
+		const dx = e.deltaX * unit;
+		const dy = e.deltaY * unit;
+		const d = Math.abs(dx) > Math.abs(dy) ? dx : dy; // pakai sumbu dominan
+
+		const THRESHOLD_PX = 30; // 👈 kecil = lebih sensitif (coba 20/15 kalau mau super peka)
+		if (Math.abs(d) < THRESHOLD_PX) return;
+
+		if (d > 0 && canNext) {
+			setPage((p) => Math.min(pages.length - 1, p + 1));
+			wheelLastTsRef.current = now;
+		} else if (d < 0 && canPrev) {
+			setPage((p) => Math.max(0, p - 1));
+			wheelLastTsRef.current = now;
+		}
+	};
 
 	return (
 		<div className="flex h-full min-h-0 w-full flex-col">
@@ -227,21 +363,29 @@ export function HeroShelf() {
 							disabled={!canPrev}
 						/>
 
-						<div className="h-full min-h-0 flex-1 overflow-hidden">
+						{/* VIEWPORT: area terlihat; overflow hidden biar hanya 1 halaman tampil */}
+						<div
+							ref={viewportRef}
+							className="h-full min-h-0 flex-1 overflow-hidden select-none"
+							onWheel={onWheel}
+							onPointerDown={onPointerDown}
+							onPointerMove={onPointerMove}
+							onPointerUp={onPointerUp}
+							// buat touch lebih mulus (geser horizontal), tapi tetap bisa scroll vertikal kalau ada
+							style={{ touchAction: "pan-y" }}
+						>
+							{/* TRACK: digeser dengan transform (seperti kode aslimu) */}
 							<div
-								className="flex h-full min-h-0 transition-transform duration-300 ease-out"
-								style={{
-									transform: `translateX(-${page * 100}%)`,
-								}}
+								ref={trackRef}
+								className="flex h-full min-h-0"
+								style={{ transform: `translateX(-${page * 100}%)` }}
 							>
+								{/* Loading skeleton page */}
 								{heroes === undefined && (
 									<div className="h-full min-h-0 w-full shrink-0">
 										<div
 											className="grid h-full min-h-0 w-full grid-cols-3"
-											style={{
-												gridTemplateRows: "minmax(0,1fr)",
-												gap: "16px",
-											}}
+											style={{ gridTemplateRows: "minmax(0,1fr)", gap: "16px" }}
 										>
 											{Array.from({ length: COLS }).map((_, i) => (
 												<div
@@ -253,6 +397,7 @@ export function HeroShelf() {
 									</div>
 								)}
 
+								{/* Data pages */}
 								{heroes !== undefined &&
 									(pages.length ? (
 										pages.map((group, idx) => (
@@ -280,19 +425,21 @@ export function HeroShelf() {
 															}}
 														/>
 													))}
+													{/* filler agar grid selalu 3 kolom pas */}
 													{group.length < COLS &&
-														Array.from({
-															length: COLS - group.length,
-														}).map((_, i) => (
-															<div
-																key={`f-${i}`}
-																className="invisible h-full min-h-0"
-															/>
-														))}
+														Array.from({ length: COLS - group.length }).map(
+															(_, i) => (
+																<div
+																	key={`f-${i}`}
+																	className="invisible h-full min-h-0"
+																/>
+															),
+														)}
 												</div>
 											</div>
 										))
 									) : (
+										// No data page
 										<div className="h-full min-h-0 w-full shrink-0">
 											<div
 												className="grid h-full min-h-0 w-full grid-cols-3"
@@ -301,9 +448,7 @@ export function HeroShelf() {
 													gap: "16px",
 												}}
 											>
-												{Array.from({
-													length: COLS,
-												}).map((_, i) => (
+												{Array.from({ length: COLS }).map((_, i) => (
 													<div
 														key={i}
 														className="grid h-full min-h-0 place-items-center rounded-2xl bg-zinc-800/70 text-zinc-400 ring-1 ring-white/10"
