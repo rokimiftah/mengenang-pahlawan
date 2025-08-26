@@ -56,44 +56,43 @@ export function AuthenticationForm() {
 			newPassword: "",
 		},
 		validate: {
-			email: (value) => (isEmail(value) ? null : "Invalid email address"),
+			email: (value) => (isEmail(value) ? null : "Alamat email tidak valid"),
 			password: (value) => {
 				if (type === "signUp") {
-					if (value.length < 6)
-						return "Password must be at least 6 characters long";
-					if (!/[0-9]/.test(value)) return "Password must include a number";
+					if (value.length < 6) return "Kata sandi minimal 6 karakter";
+					if (!/[0-9]/.test(value)) return "Kata sandi harus mengandung angka";
 					if (!/[a-z]/.test(value))
-						return "Password must include a lowercase letter";
+						return "Kata sandi harus mengandung huruf kecil";
 					if (!/[A-Z]/.test(value))
-						return "Password must include an uppercase letter";
+						return "Kata sandi harus mengandung huruf besar";
 					if (!/[$&+,:;=?@#|'<>.^*()%!-]/.test(value))
-						return "Password must include a special symbol";
+						return "Kata sandi harus mengandung simbol khusus";
 				}
 				if (type === "signIn" && value.length === 0) {
-					return "Password cannot be empty";
+					return "Kata sandi tidak boleh kosong";
 				}
 				return null;
 			},
 			confirmPassword: (value, values) =>
 				type === "signUp" && value !== values.password
-					? "Passwords do not match"
+					? "Konfirmasi kata sandi tidak sama"
 					: null,
 			code: (value) =>
 				(type === "verify" || type === "reset") && value.length !== 6
-					? "Verification code must be 6 digits"
+					? "Kode verifikasi harus 6 digit"
 					: null,
 			newPassword: (value) => {
 				if (type === "reset") {
-					if (value.length === 0) return "New password cannot be empty";
-					if (value.length < 6)
-						return "New password must be at least 6 characters long";
-					if (!/[0-9]/.test(value)) return "New password must include a number";
+					if (value.length === 0) return "Kata sandi baru tidak boleh kosong";
+					if (value.length < 6) return "Kata sandi baru minimal 6 karakter";
+					if (!/[0-9]/.test(value))
+						return "Kata sandi baru harus mengandung angka";
 					if (!/[a-z]/.test(value))
-						return "New password must include a lowercase letter";
+						return "Kata sandi baru harus mengandung huruf kecil";
 					if (!/[A-Z]/.test(value))
-						return "New password must include an uppercase letter";
+						return "Kata sandi baru harus mengandung huruf besar";
 					if (!/[$&+,:;=?@#|'<>.^*()%!-]/.test(value))
-						return "New password must include a special symbol";
+						return "Kata sandi baru harus mengandung simbol khusus";
 				}
 				return null;
 			},
@@ -109,8 +108,8 @@ export function AuthenticationForm() {
 			const errorMessage =
 				error instanceof ConvexError
 					? (error.data as { message: string }).message ||
-						"Failed to login with GitHub"
-					: "Failed to login with GitHub";
+						"Gagal masuk dengan GitHub"
+					: "Gagal masuk dengan GitHub";
 			setError(errorMessage);
 			setIsLoading(false);
 		}
@@ -132,7 +131,7 @@ export function AuthenticationForm() {
 
 					if (type === "signIn" && !userExists) {
 						setIsLoading(false);
-						setError("Invalid Email or Password");
+						setError("Email atau kata sandi tidak valid");
 						return;
 					}
 
@@ -145,22 +144,34 @@ export function AuthenticationForm() {
 							!providers.includes("password")
 						) {
 							setIsLoading(false);
-							setError(
-								"You are already registered with GitHub. Please use GitHub to log in.",
-							);
+							setError("Email ini terdaftar melalui GitHub");
+							return;
+						}
+					}
+
+					if (type === "forgot" && userExists) {
+						const providers = await convex.query(api.users.checkUserProvider, {
+							email: normalizedEmail,
+						});
+						if (
+							providers?.includes("github") &&
+							!providers.includes("password")
+						) {
+							setIsLoading(false);
+							setError("Email ini terdaftar melalui GitHub");
 							return;
 						}
 					}
 
 					if (type === "signUp" && userExists) {
 						setIsLoading(false);
-						setError("Email already registered. Please login");
+						setError("Email ini sudah terdaftar");
 						return;
 					}
 
 					if (type === "forgot" && !userExists) {
 						setIsLoading(false);
-						setError("No user registered with this email");
+						setError("Tidak ada pengguna terdaftar dengan email ini");
 						return;
 					}
 				}
@@ -187,12 +198,16 @@ export function AuthenticationForm() {
 				if (type === "signIn" && !result.signingIn) {
 					const isVerified = await convex.query(
 						api.users.getUserVerificationStatus,
-						{ email: normalizedEmail },
+						{
+							email: normalizedEmail,
+						},
 					);
 					if (!isVerified) {
 						setEmail(normalizedEmail);
 						toggle("verify");
-						setError("Email not verified. Please verify your email");
+						setError(
+							"Email belum terverifikasi. Silakan verifikasi email Anda",
+						);
 						setIsLoading(false);
 						return;
 					}
@@ -213,8 +228,8 @@ export function AuthenticationForm() {
 						const errorMessage =
 							verifyError instanceof ConvexError
 								? (verifyError.data as { message: string }).message ||
-									"Failed to verify email"
-								: "Failed to verify email";
+									"Gagal verifikasi email"
+								: "Gagal verifikasi email";
 						setError(errorMessage);
 						setIsLoading(false);
 						return;
@@ -231,25 +246,25 @@ export function AuthenticationForm() {
 						(errorData.message === "Invalid credentials" ||
 							errorData.message.includes("Invalid password"))
 					) {
-						errorMessage = "Invalid Email or Password";
+						errorMessage = "Email atau kata sandi tidak valid";
 					} else {
 						errorMessage =
 							errorData.message ||
 							(type === "verify"
-								? "Invalid or expired verification code"
+								? "Kode verifikasi tidak valid atau sudah kedaluwarsa"
 								: type === "reset"
-									? "Invalid or expired reset code"
-									: "An unexpected error occurred");
+									? "Kode pemulihan tidak valid atau sudah kedaluwarsa"
+									: "Terjadi kesalahan yang tidak terduga");
 					}
 				} else {
 					errorMessage =
 						type === "signIn"
-							? "Invalid Email or Password"
+							? "Email atau kata sandi tidak valid"
 							: type === "verify"
-								? "Invalid or expired verification code"
+								? "Kode verifikasi tidak valid atau sudah kedaluwarsa"
 								: type === "reset"
-									? "Invalid or expired reset code"
-									: "An unexpected error occurred";
+									? "Kode pemulihan tidak valid atau sudah kedaluwarsa"
+									: "Terjadi kesalahan yang tidak terduga";
 				}
 				setError(errorMessage);
 			} finally {
@@ -277,6 +292,7 @@ export function AuthenticationForm() {
 				withBorder
 				className="w-full max-w-md"
 				aria-labelledby="auth-title"
+				bg="dark"
 			>
 				<Text id="auth-title" size="md" fw={700} ta="center" mb="xl">
 					Mengenang Pahlawan
@@ -294,7 +310,7 @@ export function AuthenticationForm() {
 							</GitHubButton>
 						</Group>
 						<Divider
-							label="Or continue with email"
+							label="Atau lanjutkan dengan email"
 							labelPosition="center"
 							mt="xl"
 							mb="lg"
@@ -315,9 +331,9 @@ export function AuthenticationForm() {
 									</Text>
 								</Group>
 								<TextInput
-									placeholder="your@email.com"
+									placeholder="nama@domain.com"
 									radius="md"
-									aria-label="Email address"
+									aria-label="Alamat email"
 									{...form.getInputProps("email")}
 								/>
 							</>
@@ -326,17 +342,17 @@ export function AuthenticationForm() {
 						{(type === "verify" || type === "reset") && email && (
 							<>
 								<Text ta="center" mb="xl">
-									A verification code has been sent to {email}.
+									Kode verifikasi telah dikirim ke {email}.
 								</Text>
 								<Group mb="5">
 									<Text size="sm" fw={500}>
-										Verification Code <span className="text-red-500">*</span>
+										Kode Verifikasi <span className="text-red-500">*</span>
 									</Text>
 								</Group>
 								<TextInput
-									placeholder="Enter 6-digit code"
+									placeholder="Masukkan 6 digit kode"
 									radius="md"
-									aria-label="Verification code"
+									aria-label="Kode verifikasi"
 									{...form.getInputProps("code")}
 								/>
 							</>
@@ -346,7 +362,7 @@ export function AuthenticationForm() {
 							<>
 								<Group justify="space-between" mb="5" mt="25">
 									<Text size="sm" fw={500}>
-										Password <span className="text-red-500">*</span>
+										Kata Sandi <span className="text-red-500">*</span>
 									</Text>
 									<Anchor
 										href="#"
@@ -358,13 +374,13 @@ export function AuthenticationForm() {
 										}}
 										underline="hover"
 									>
-										Forgot your password?
+										Lupa kata sandi?
 									</Anchor>
 								</Group>
 								<PasswordInput
-									placeholder="••••••••"
+									placeholder="••••••"
 									radius="md"
-									aria-label="Password"
+									aria-label="Kata sandi"
 									{...form.getInputProps("password")}
 								/>
 							</>
@@ -374,24 +390,25 @@ export function AuthenticationForm() {
 							<>
 								<Group mb="5" mt="25">
 									<Text size="sm" fw={500}>
-										Password <span className="text-red-500">*</span>
+										Kata Sandi <span className="text-red-500">*</span>
 									</Text>
 								</Group>
 								<PasswordInput
-									placeholder="••••••••"
+									placeholder="••••••"
 									radius="md"
-									aria-label="Password"
+									aria-label="Kata sandi"
 									{...form.getInputProps("password")}
 								/>
 								<Group mb="5" mt="25">
 									<Text size="sm" fw={500}>
-										Confirm Password <span className="text-red-500">*</span>
+										Konfirmasi Kata Sandi{" "}
+										<span className="text-red-500">*</span>
 									</Text>
 								</Group>
 								<PasswordInput
-									placeholder="••••••••"
+									placeholder="••••••"
 									radius="md"
-									aria-label="Confirm password"
+									aria-label="Konfirmasi kata sandi"
 									{...form.getInputProps("confirmPassword")}
 								/>
 								<PasswordStrength password={form.values.password} />
@@ -402,13 +419,13 @@ export function AuthenticationForm() {
 							<>
 								<Group mb="5" mt="25">
 									<Text size="sm" fw={500}>
-										New Password <span className="text-red-500">*</span>
+										Kata Sandi Baru <span className="text-red-500">*</span>
 									</Text>
 								</Group>
 								<PasswordInput
-									placeholder="••••••••"
+									placeholder="••••••"
 									radius="md"
-									aria-label="New password"
+									aria-label="Kata sandi baru"
 									{...form.getInputProps("newPassword")}
 								/>
 								<PasswordStrength password={form.values.newPassword} />
@@ -428,19 +445,17 @@ export function AuthenticationForm() {
 									toggleType(
 										type === "signIn"
 											? "signUp"
-											: type === "forgot" ||
-												  type === "verify" ||
-												  type === "reset"
+											: type === "signUp"
 												? "signIn"
 												: "signIn",
 									)
 								}
 							>
 								{type === "signIn"
-									? "Don't have an account? Register"
+									? "Belum punya akun? Daftar"
 									: type === "signUp"
-										? "Already have an account? Login"
-										: "Back to Login"}
+										? "Sudah punya akun? Masuk"
+										: "Kembali ke Masuk"}
 							</Anchor>
 							<Button
 								type="submit"
@@ -450,12 +465,12 @@ export function AuthenticationForm() {
 								className="w-32 bg-[#f5d90a] text-[#111110] transition-all duration-200 hover:bg-[#f5d90ae6]"
 							>
 								{type === "signIn"
-									? "Login"
+									? "Masuk"
 									: type === "signUp"
-										? "Register"
+										? "Daftar"
 										: type === "forgot"
-											? "Forgot"
-											: "Continue"}
+											? "Kirim Kode"
+											: "Lanjutkan"}
 							</Button>
 						</Group>
 					</fieldset>

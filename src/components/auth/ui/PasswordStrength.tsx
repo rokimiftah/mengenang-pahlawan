@@ -26,10 +26,10 @@ function PasswordRequirement({ meets, label }: PasswordRequirementProps) {
 }
 
 const requirements = [
-	{ re: /[0-9]/, label: "Includes number" },
-	{ re: /[a-z]/, label: "Includes lowercase letter" },
-	{ re: /[A-Z]/, label: "Includes uppercase letter" },
-	{ re: /[$&+,:;=?@#|'<>.^*()%!-]/, label: "Includes special symbol" },
+	{ re: /[0-9]/, label: "Mengandung angka" },
+	{ re: /[a-z]/, label: "Mengandung huruf kecil" },
+	{ re: /[A-Z]/, label: "Mengandung huruf besar" },
+	{ re: /[$&+,:;=?@#|'<>.^*()%!-]/, label: "Mengandung simbol khusus" },
 ];
 
 function getStrength(password: string) {
@@ -88,7 +88,7 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
 				{bars}
 			</Group>
 			<PasswordRequirement
-				label="Has at least 6 characters"
+				label="Minimal 6 karakter"
 				meets={password.length > 5}
 			/>
 			{checks}
