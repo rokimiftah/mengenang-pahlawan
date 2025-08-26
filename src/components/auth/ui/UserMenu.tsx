@@ -116,7 +116,7 @@ export function UserMenu() {
 							"dark:text-zinc-200 dark:hover:bg-zinc-800 dark:focus:bg-zinc-800",
 						].join(" ")}
 					>
-						Sign Out
+						Keluar
 					</DropdownMenu.Item>
 
 					<DropdownMenu.Arrow className="fill-white dark:fill-zinc-900" />
