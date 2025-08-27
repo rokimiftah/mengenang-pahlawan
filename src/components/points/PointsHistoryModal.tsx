@@ -50,70 +50,72 @@ export function PointsHistoryModal({
 				</Badge>
 			</Group>
 
-			<Table
-				striped
-				highlightOnHover
-				withRowBorders={false}
-				verticalSpacing="xs"
-				style={{ tableLayout: "auto" }}
-			>
-				<Table.Thead>
-					<Table.Tr>
-						<Table.Th>Waktu</Table.Th>
-						<Table.Th>Pahlawan</Table.Th>
-						<Table.Th style={{ width: 120, whiteSpace: "nowrap" }}>
-							Status
-						</Table.Th>
-						<Table.Th ta="right">Poin</Table.Th>
-					</Table.Tr>
-				</Table.Thead>
-				<Table.Tbody>
-					{(rows ?? []).map((r: any, i: number) => (
-						<Table.Tr key={i}>
-							<Table.Td>{formatDT(r.createdAt)}</Table.Td>
-							<Table.Td>{r.heroName}</Table.Td>
-
-							<Table.Td style={{ width: 120, whiteSpace: "nowrap" }}>
-								{r.practice ? (
-									<Badge
-										color="gray"
-										variant="light"
-										radius="sm"
-										size="sm"
-										styles={{
-											root: { whiteSpace: "nowrap" },
-										}}
-									>
-										Latihan
-									</Badge>
-								) : (
-									<Badge color="yellow" variant="light" radius="md" size="md">
-										Berbobot
-									</Badge>
-								)}
-							</Table.Td>
-
-							<Table.Td ta="right">
-								{r.points > 0 ? (
-									<Text fw={700}>+{r.points}</Text>
-								) : (
-									<Text c="dimmed">0</Text>
-								)}
-							</Table.Td>
-						</Table.Tr>
-					))}
-
-					{(!rows || rows.length === 0) && (
+			<Table.ScrollContainer minWidth={560}>
+				<Table
+					striped
+					highlightOnHover
+					withRowBorders={false}
+					verticalSpacing="xs"
+					style={{ tableLayout: "auto" }}
+				>
+					<Table.Thead>
 						<Table.Tr>
-							<Table.Td colSpan={4}>
-								<Text c="dimmed" ta="center">
-									Belum ada riwayat.
-								</Text>
-							</Table.Td>
+							<Table.Th>Waktu</Table.Th>
+							<Table.Th>Pahlawan</Table.Th>
+							<Table.Th style={{ width: 120, whiteSpace: "nowrap" }}>
+								Status
+							</Table.Th>
+							<Table.Th ta="right">Poin</Table.Th>
 						</Table.Tr>
-					)}
-				</Table.Tbody>
-			</Table>
+					</Table.Thead>
+					<Table.Tbody>
+						{(rows ?? []).map((r: any, i: number) => (
+							<Table.Tr key={i}>
+								<Table.Td>{formatDT(r.createdAt)}</Table.Td>
+								<Table.Td>{r.heroName}</Table.Td>
+
+								<Table.Td style={{ width: 120, whiteSpace: "nowrap" }}>
+									{r.practice ? (
+										<Badge
+											color="gray"
+											variant="light"
+											radius="sm"
+											size="sm"
+											styles={{
+												root: { whiteSpace: "nowrap" },
+											}}
+										>
+											Latihan
+										</Badge>
+									) : (
+										<Badge color="yellow" variant="light" radius="md" size="md">
+											Berbobot
+										</Badge>
+									)}
+								</Table.Td>
+
+								<Table.Td ta="right">
+									{r.points > 0 ? (
+										<Text fw={700}>+{r.points}</Text>
+									) : (
+										<Text c="dimmed">0</Text>
+									)}
+								</Table.Td>
+							</Table.Tr>
+						))}
+
+						{(!rows || rows.length === 0) && (
+							<Table.Tr>
+								<Table.Td colSpan={4}>
+									<Text c="dimmed" ta="center">
+										Belum ada riwayat.
+									</Text>
+								</Table.Td>
+							</Table.Tr>
+						)}
+					</Table.Tbody>
+				</Table>
+			</Table.ScrollContainer>
 		</Modal>
 	);
 }
