@@ -120,7 +120,7 @@ export const Home = () => {
 		<>
 			<div className="flex min-h-dvh flex-col overflow-hidden bg-[#111110]">
 				<div className="mx-auto w-full max-w-screen-2xl flex-shrink-0">
-					<header className="flex items-center justify-between px-4 py-[max(12px,env(safe-area-inset-top))] md:px-8 md:py-8">
+					<header className="flex min-h-[86px] items-center justify-between px-4 py-4 md:min-h-[118px] md:px-8 md:py-8">
 						<a
 							href="/"
 							className="inline-flex items-center gap-2.5 text-2xl font-bold text-black"
@@ -128,7 +128,7 @@ export const Home = () => {
 						>
 							<svg
 								viewBox="0 0 266.66666 266.66666"
-								className="h-10 w-10 text-indigo-500 sm:h-12 sm:w-12"
+								className="h-12 w-12 text-indigo-500 sm:h-12 sm:w-12"
 								fill="currentColor"
 								xmlns="http://www.w3.org/2000/svg"
 							>
@@ -227,7 +227,7 @@ export const Home = () => {
 						</a>
 
 						<button
-							className="mt-2 mb-2 inline-flex h-10 w-28 cursor-pointer items-center justify-center rounded-xl bg-red-600 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#C70039] active:bg-[#900020] disabled:cursor-not-allowed disabled:bg-[#900020] sm:h-11 sm:w-32 sm:text-base"
+							className="inline-flex h-10 w-28 cursor-pointer items-center justify-center rounded-xl bg-red-600 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#C70039] active:bg-[#900020] disabled:cursor-not-allowed disabled:bg-[#900020] sm:h-11 sm:w-32 sm:text-base"
 							onClick={goToDashboard}
 							onKeyDown={(e) => {
 								if (e.key === "Enter" || e.key === " ") goToDashboard();

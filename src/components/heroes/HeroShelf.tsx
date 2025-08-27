@@ -28,14 +28,23 @@ const ERA_OPTIONS = [
 	"Revolusi & Orde Lama",
 ] as const;
 
+function calcCols(width: number) {
+	// Mobile <768 => 1; Tablet 768–1023 => 2; Desktop >=1024 => 3
+	if (width < 768) return 1;
+	if (width < 1024) return 2;
+	return 3;
+}
+
 function SideArrow({
 	dir,
 	onClick,
 	disabled,
+	className,
 }: {
 	dir: "left" | "right";
 	onClick: () => void;
 	disabled: boolean;
+	className?: string;
 }) {
 	return (
 		<button
@@ -45,12 +54,12 @@ function SideArrow({
 			aria-disabled={disabled}
 			disabled={disabled}
 			className={[
-				"h-12 w-12 shrink-0 self-center rounded-full",
-				"grid place-items-center bg-black/60 text-white backdrop-blur",
-				"shadow-md transition",
+				"grid h-12 w-12 place-items-center rounded-full",
+				"bg-black/60 text-white shadow-md backdrop-blur transition",
 				disabled
 					? "cursor-not-allowed opacity-30"
 					: "cursor-pointer hover:bg-black/70",
+				className || "",
 			].join(" ")}
 		>
 			<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -136,16 +145,30 @@ export function HeroShelf() {
 	})();
 	const [era, setEra] = useState<(typeof ERA_OPTIONS)[number]>(initialEra);
 
+	// responsive cols
+	const [cols, setCols] = useState<number>(() =>
+		calcCols(typeof window !== "undefined" ? window.innerWidth : 1024),
+	);
+	useEffect(() => {
+		const onResize = () => {
+			const next = calcCols(window.innerWidth);
+			setCols((prev) => (prev === next ? prev : next));
+		};
+		onResize();
+		window.addEventListener("resize", onResize);
+		return () => window.removeEventListener("resize", onResize);
+	}, []);
+
 	const heroes = useQuery(api.heroes.list, { q: filters.q, era });
 
-	const COLS = 3;
 	const pages = useMemo<Hero[][]>(() => {
 		const list = heroes ?? [];
 		const out: Hero[][] = [];
-		for (let i = 0; i < list.length; i += COLS)
-			out.push(list.slice(i, i + COLS));
+		const step = Math.max(1, cols);
+		for (let i = 0; i < list.length; i += step)
+			out.push(list.slice(i, i + step));
 		return out;
-	}, [heroes]);
+	}, [heroes, cols]);
 
 	const storedPage =
 		typeof stored?.pageByEra?.[initialEra] === "number"
@@ -281,10 +304,8 @@ export function HeroShelf() {
 	};
 
 	const wheelLastTsRef = useRef(0);
-
 	const onWheel = (e: React.WheelEvent) => {
 		if (pages.length <= 1) return;
-
 		const now = performance.now();
 		const COOLDOWN_MS = 140;
 		if (now - wheelLastTsRef.current < COOLDOWN_MS) return;
@@ -318,8 +339,16 @@ export function HeroShelf() {
 				value={era}
 				onValueChange={(v) => setEra(v as any)}
 			>
+				{/* Tabs.List: responsive (scrollable on mobile, centered on sm+) */}
 				<Tabs.List
-					className="inline-flex h-10 shrink-0 items-center justify-center gap-1 self-center rounded-xl bg-zinc-900/60 p-1 ring-1 ring-white/10"
+					className={[
+						"flex h-10 items-center gap-1 rounded-xl bg-zinc-900/60 p-1 ring-1 ring-white/10",
+						"w-full max-w-full overflow-x-auto sm:w-auto sm:max-w-none sm:self-center sm:overflow-visible",
+						// hide scrollbars cross-browser:
+						"[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+						"justify-start sm:justify-center",
+						"px-2 sm:px-1",
+					].join(" ")}
 					aria-label="Pilih era"
 				>
 					{ERA_OPTIONS.map((value) => (
@@ -327,7 +356,7 @@ export function HeroShelf() {
 							key={value}
 							value={value}
 							className={[
-								"inline-flex cursor-pointer items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap",
+								"inline-flex shrink-0 cursor-pointer items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap",
 								"text-zinc-300 transition hover:text-white",
 								"data-[state=active]:bg-zinc-700/60 data-[state=active]:text-white data-[state=active]:shadow",
 								"focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-300",
@@ -342,110 +371,132 @@ export function HeroShelf() {
 					value={era}
 					className="mt-4 min-h-0 flex-1 focus:outline-none"
 				>
+					{/* parent retains gap-4 per layout; image area still fills since child is full-width */}
 					<div className="flex h-full min-h-0 w-full items-stretch gap-4">
-						<SideArrow
-							dir="left"
-							onClick={() => setPage((p) => Math.max(0, p - 1))}
-							disabled={!canPrev}
-						/>
-
-						<div
-							ref={viewportRef}
-							className="h-full min-h-0 flex-1 overflow-hidden select-none"
-							onWheel={onWheel}
-							onPointerDown={onPointerDown}
-							onPointerMove={onPointerMove}
-							onPointerUp={onPointerUp}
-							style={{ touchAction: "pan-y" }}
-						>
+						{/* RELATIVE WRAPPER so arrows can overlay above the images */}
+						<div className="relative h-full min-h-0 w-full flex-1">
+							{/* viewport */}
 							<div
-								ref={trackRef}
-								className="flex h-full min-h-0"
-								style={{ transform: `translateX(-${page * 100}%)` }}
+								ref={viewportRef}
+								className="h-full min-h-0 w-full overflow-hidden select-none"
+								onWheel={onWheel}
+								onPointerDown={onPointerDown}
+								onPointerMove={onPointerMove}
+								onPointerUp={onPointerUp}
+								style={{ touchAction: "pan-y" }}
 							>
-								{heroes === undefined && (
-									<div className="h-full min-h-0 w-full shrink-0">
-										<div
-											className="grid h-full min-h-0 w-full grid-cols-3"
-											style={{ gridTemplateRows: "minmax(0,1fr)", gap: "16px" }}
-										>
-											{Array.from({ length: COLS }).map((_, i) => (
-												<div
-													key={i}
-													className="h-full min-h-0 animate-pulse rounded-2xl bg-zinc-800/70"
-												/>
-											))}
-										</div>
-									</div>
-								)}
-
-								{heroes !== undefined &&
-									(pages.length ? (
-										pages.map((group, idx) => (
-											<div key={idx} className="h-full min-h-0 w-full shrink-0">
-												<div
-													className="grid h-full min-h-0 w-full grid-cols-3"
-													style={{
-														gridTemplateRows: "minmax(0,1fr)",
-														gap: "16px",
-													}}
-												>
-													{group.map((h) => (
-														<HeroCard
-															key={h.slug}
-															hero={h}
-															onClick={() => {
-																writeStored(era, page);
-																if (document.startViewTransition) {
-																	document.startViewTransition(() =>
-																		navigate(`/pahlawan/${h.slug}`),
-																	);
-																} else {
-																	navigate(`/pahlawan/${h.slug}`);
-																}
-															}}
-														/>
-													))}
-													{group.length < COLS &&
-														Array.from({ length: COLS - group.length }).map(
-															(_, i) => (
-																<div
-																	key={`f-${i}`}
-																	className="invisible h-full min-h-0"
-																/>
-															),
-														)}
-												</div>
-											</div>
-										))
-									) : (
+								<div
+									ref={trackRef}
+									className="flex h-full min-h-0"
+									style={{ transform: `translateX(-${page * 100}%)` }}
+								>
+									{heroes === undefined && (
 										<div className="h-full min-h-0 w-full shrink-0">
 											<div
-												className="grid h-full min-h-0 w-full grid-cols-3"
+												className="grid h-full min-h-0 w-full"
 												style={{
+													gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
 													gridTemplateRows: "minmax(0,1fr)",
 													gap: "16px",
 												}}
 											>
-												{Array.from({ length: COLS }).map((_, i) => (
+												{Array.from({ length: cols }).map((_, i) => (
 													<div
 														key={i}
-														className="grid h-full min-h-0 place-items-center rounded-2xl bg-zinc-800/70 text-zinc-400 ring-1 ring-white/10"
-													>
-														Tidak ada data
-													</div>
+														className="h-full min-h-0 animate-pulse rounded-2xl bg-zinc-800/70"
+													/>
 												))}
 											</div>
 										</div>
-									))}
+									)}
+
+									{heroes !== undefined &&
+										(pages.length ? (
+											pages.map((group, idx) => (
+												<div
+													key={idx}
+													className="h-full min-h-0 w-full shrink-0"
+												>
+													<div
+														className="grid h-full min-h-0 w-full"
+														style={{
+															gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+															gridTemplateRows: "minmax(0,1fr)",
+															gap: "16px",
+														}}
+													>
+														{group.map((h) => (
+															<HeroCard
+																key={h.slug}
+																hero={h}
+																onClick={() => {
+																	writeStored(era, page);
+																	if (document.startViewTransition) {
+																		document.startViewTransition(() =>
+																			navigate(`/pahlawan/${h.slug}`),
+																		);
+																	} else {
+																		navigate(`/pahlawan/${h.slug}`);
+																	}
+																}}
+															/>
+														))}
+														{group.length < cols &&
+															Array.from({ length: cols - group.length }).map(
+																(_, i) => (
+																	<div
+																		key={`f-${i}`}
+																		className="invisible h-full min-h-0"
+																	/>
+																),
+															)}
+													</div>
+												</div>
+											))
+										) : (
+											<div className="h-full min-h-0 w-full shrink-0">
+												<div
+													className="grid h-full min-h-0 w-full"
+													style={{
+														gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+														gridTemplateRows: "minmax(0,1fr)",
+														gap: "16px",
+													}}
+												>
+													{Array.from({ length: cols }).map((_, i) => (
+														<div
+															key={i}
+															className="grid h-full min-h-0 place-items-center rounded-2xl bg-zinc-800/70 text-zinc-400 ring-1 ring-white/10"
+														>
+															Tidak ada data
+														</div>
+													))}
+												</div>
+											</div>
+										))}
+								</div>
+							</div>
+
+							{/* OVERLAY ARROWS (z-index di atas gambar) */}
+							<div className="pointer-events-none absolute inset-y-0 left-2 z-20 flex items-center">
+								<SideArrow
+									dir="left"
+									onClick={() => setPage((p) => Math.max(0, p - 1))}
+									disabled={!canPrev}
+									className="pointer-events-auto"
+								/>
+							</div>
+							<div className="pointer-events-none absolute inset-y-0 right-2 z-20 flex items-center">
+								<SideArrow
+									dir="right"
+									onClick={() =>
+										setPage((p) => Math.min(pages.length - 1, p + 1))
+									}
+									disabled={!canNext}
+									className="pointer-events-auto"
+								/>
 							</div>
 						</div>
-
-						<SideArrow
-							dir="right"
-							onClick={() => setPage((p) => Math.min(pages.length - 1, p + 1))}
-							disabled={!canNext}
-						/>
 					</div>
 				</Tabs.Content>
 			</Tabs.Root>
