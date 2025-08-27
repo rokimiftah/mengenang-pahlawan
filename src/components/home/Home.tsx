@@ -1,4 +1,5 @@
 // src/components/home/Home.tsx
+
 import { useEffect, useMemo, useState } from "react";
 
 import { useLocation } from "wouter";
