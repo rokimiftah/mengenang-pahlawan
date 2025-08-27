@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
 
 import * as Accordion from "@radix-ui/react-accordion";
-import * as Dialog from "@radix-ui/react-dialog";
 import { IconChevronDown } from "@tabler/icons-react";
 
 import "./Home.css";
@@ -42,35 +41,6 @@ function FaqItem({
 				<div className="relative rounded-xl bg-[#ECEEDF] p-4 ring-1 ring-gray-200">
 					<div className="faq-scroll max-h-40 overflow-auto pr-1 text-sm leading-relaxed text-gray-700 md:max-h-[38vh]">
 						{answer}
-					</div>
-
-					<div className="mt-3 md:hidden">
-						<Dialog.Root>
-							<Dialog.Trigger asChild>
-								<button className="rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-[#C70039] focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500">
-									Baca selengkapnya
-								</button>
-							</Dialog.Trigger>
-
-							<Dialog.Portal>
-								<Dialog.Overlay className="data-[state=open]:animate-fade-in fixed inset-0 bg-black/40" />
-								<Dialog.Content className="data-[state=open]:animate-zoom-in fixed top-1/2 left-1/2 z-50 w-[92vw] max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl focus:outline-none">
-									<Dialog.Title className="mb-2 text-lg font-semibold text-black">
-										{question}
-									</Dialog.Title>
-									<div className="max-h-[70vh] overflow-auto pr-1 text-sm leading-relaxed text-gray-800">
-										{answer}
-									</div>
-									<div className="mt-4 flex justify-end">
-										<Dialog.Close asChild>
-											<button className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-[#C70039] focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500">
-												Tutup
-											</button>
-										</Dialog.Close>
-									</div>
-								</Dialog.Content>
-							</Dialog.Portal>
-						</Dialog.Root>
 					</div>
 				</div>
 			</Accordion.Content>
