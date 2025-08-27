@@ -793,7 +793,7 @@ export function HeroDetail() {
 							{hero.name}
 						</h2>
 
-						<div className="mt-3 flex flex-wrap items-center justify-center gap-2.5">
+						<div className="mt-5 flex flex-wrap items-center justify-center gap-2.5">
 							{(hero.titles ?? []).map((t) => (
 								<SoftRedBadge key={t}>{t}</SoftRedBadge>
 							))}
@@ -801,7 +801,7 @@ export function HeroDetail() {
 
 						{Array.isArray(hero.raw?.aliases) &&
 							hero.raw.aliases.length > 0 && (
-								<div className="mt-2 flex justify-center">
+								<div className="mt-5 mb-5 flex justify-center">
 									<AliasBadge text={`Alias: ${hero.raw.aliases.join(", ")}`} />
 								</div>
 							)}
