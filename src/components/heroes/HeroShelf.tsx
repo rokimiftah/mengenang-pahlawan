@@ -29,7 +29,6 @@ const ERA_OPTIONS = [
 ] as const;
 
 function calcCols(width: number) {
-	// Mobile <768 => 1; Tablet 768–1023 => 2; Desktop >=1024 => 3
 	if (width < 768) return 1;
 	if (width < 1024) return 2;
 	return 3;
@@ -145,7 +144,6 @@ export function HeroShelf() {
 	})();
 	const [era, setEra] = useState<(typeof ERA_OPTIONS)[number]>(initialEra);
 
-	// responsive cols
 	const [cols, setCols] = useState<number>(() =>
 		calcCols(typeof window !== "undefined" ? window.innerWidth : 1024),
 	);
@@ -339,12 +337,10 @@ export function HeroShelf() {
 				value={era}
 				onValueChange={(v) => setEra(v as any)}
 			>
-				{/* Tabs.List: responsive (scrollable on mobile, centered on sm+) */}
 				<Tabs.List
 					className={[
 						"flex h-10 items-center gap-1 rounded-xl bg-zinc-900/60 p-1 ring-1 ring-white/10",
 						"w-full max-w-full overflow-x-auto sm:w-auto sm:max-w-none sm:self-center sm:overflow-visible",
-						// hide scrollbars cross-browser:
 						"[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
 						"justify-start sm:justify-center",
 						"px-2 sm:px-1",
@@ -371,11 +367,8 @@ export function HeroShelf() {
 					value={era}
 					className="mt-4 min-h-0 flex-1 focus:outline-none"
 				>
-					{/* parent retains gap-4 per layout; image area still fills since child is full-width */}
 					<div className="flex h-full min-h-0 w-full items-stretch gap-4">
-						{/* RELATIVE WRAPPER so arrows can overlay above the images */}
 						<div className="relative h-full min-h-0 w-full flex-1">
-							{/* viewport */}
 							<div
 								ref={viewportRef}
 								className="h-full min-h-0 w-full overflow-hidden select-none"
@@ -477,7 +470,6 @@ export function HeroShelf() {
 								</div>
 							</div>
 
-							{/* OVERLAY ARROWS (z-index di atas gambar) */}
 							<div className="pointer-events-none absolute inset-y-0 left-2 z-20 flex items-center">
 								<SideArrow
 									dir="left"

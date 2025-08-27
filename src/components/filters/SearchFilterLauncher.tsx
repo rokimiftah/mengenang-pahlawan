@@ -28,7 +28,6 @@ export function SearchFilterLauncher({
 	const [dq] = useDebouncedValue(q, 200);
 	useEffect(() => onApply({ q: dq || undefined }), [dq, onApply]);
 
-	// ── detect mobile (≤640px)
 	const [isMobile, setIsMobile] = useState(false);
 	useEffect(() => {
 		const mql = window.matchMedia?.("(max-width: 640px)");
@@ -39,32 +38,49 @@ export function SearchFilterLauncher({
 		return () => mql.removeEventListener("change", apply);
 	}, []);
 
-	// ── compute header middle Y (for perfect vertical centering)
-	const [headerMid, setHeaderMid] = useState<number>(40); // fallback ~40px
+	const [headerMid, setHeaderMid] = useState<number>(40);
+	const [headerRect, setHeaderRect] = useState<{
+		top: number;
+		left: number;
+		width: number;
+		height: number;
+	} | null>(null);
+
 	const measureHeader = useCallback(() => {
 		const el = document.querySelector("header");
 		if (!el) return;
 		const r = el.getBoundingClientRect();
 		setHeaderMid(r.top + r.height / 2);
+		setHeaderRect({
+			top: r.top,
+			left: r.left,
+			width: r.width,
+			height: r.height,
+		});
 	}, []);
+
 	useLayoutEffect(() => {
 		measureHeader();
 		const onResize = () => measureHeader();
+		const onScroll = () => measureHeader();
+
 		window.addEventListener("resize", onResize);
-		// observe header size changes
+		window.addEventListener("scroll", onScroll, { passive: true });
+
 		const el = document.querySelector("header");
 		const ro =
 			el && "ResizeObserver" in window
 				? new ResizeObserver(measureHeader)
 				: null;
 		ro?.observe(el as Element);
+
 		return () => {
 			window.removeEventListener("resize", onResize);
+			window.removeEventListener("scroll", onScroll);
 			ro?.disconnect();
 		};
 	}, [measureHeader]);
 
-	// widths
 	const [inlineWidth, setInlineWidth] = useState(240);
 	const [mobileWidth, setMobileWidth] = useState(260);
 	useEffect(() => {
@@ -112,7 +128,6 @@ export function SearchFilterLauncher({
 
 	return (
 		<div ref={wrapperRef} className="relative inline-block">
-			{/* icon saat tertutup */}
 			{!mounted && (
 				<ActionIcon
 					size="lg"
@@ -127,22 +142,32 @@ export function SearchFilterLauncher({
 				</ActionIcon>
 			)}
 
-			{/* input */}
+			{mounted && isMobile && open && headerRect && (
+				<div
+					className="fixed z-[55]"
+					style={{
+						top: headerRect.top,
+						left: headerRect.left,
+						width: headerRect.width,
+						height: headerRect.height,
+						background: "#111110",
+					}}
+					onClick={clearAndClose}
+				/>
+			)}
+
 			{mounted && (
 				<div
 					onTransitionEnd={onTransitionEnd}
 					className={[
 						"flex items-center overflow-hidden rounded-full bg-white shadow-sm transition-all duration-200 ease-out",
 						ringClass,
-						isMobile
-							? // MOBILE: fixed & centered horizontally in the header
-								"fixed left-1/2 z-[60] h-10 px-3"
-							: "px-3",
+						isMobile ? "fixed left-1/2 z-[60] h-10 px-3" : "px-3",
 					].join(" ")}
 					style={
 						isMobile
 							? {
-									top: headerMid, // vertical center of header
+									top: headerMid,
 									transform: `translate(-50%, -50%)`,
 									width: open ? mobileWidth : 0,
 									opacity: open ? 1 : 0,
