@@ -1,5 +1,4 @@
 // src/components/home/Home.tsx
-
 import { useEffect, useMemo, useState } from "react";
 
 import { useLocation } from "wouter";
@@ -22,14 +21,14 @@ function FaqItem({
 	return (
 		<Accordion.Item
 			value={value}
-			className="group flex min-h-0 flex-col data-[state=closed]:h-14 data-[state=open]:flex-1"
+			className="group flex min-h-0 flex-col border-b last:border-b-0 data-[state=closed]:h-14 md:data-[state=open]:flex-1"
 		>
 			<Accordion.Header asChild>
 				<Accordion.Trigger
-					className="flex h-14 cursor-pointer items-center justify-between gap-4 px-5 text-left text-gray-900 transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+					className="flex h-14 cursor-pointer items-center justify-between gap-4 px-4 text-left text-gray-900 transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 md:px-5"
 					aria-label={question}
 				>
-					<span className="line-clamp-1 pr-6 text-base font-medium md:text-lg">
+					<span className="line-clamp-1 pr-6 text-base font-medium sm:text-lg">
 						{question}
 					</span>
 					<IconChevronDown
@@ -39,14 +38,20 @@ function FaqItem({
 				</Accordion.Trigger>
 			</Accordion.Header>
 
-			<Accordion.Content className="px-5 pt-0 pb-5">
+			<Accordion.Content className="px-4 pt-0 pb-4 md:px-5 md:pb-5">
 				<div className="relative rounded-xl bg-[#ECEEDF] p-4 ring-1 ring-gray-200">
-					<p className="line-clamp-4 text-sm leading-relaxed text-gray-700">
+					<div className="faq-scroll max-h-40 overflow-auto pr-1 text-sm leading-relaxed text-gray-700 md:max-h-[38vh]">
 						{answer}
-					</p>
+					</div>
 
-					<div className="mt-3">
+					<div className="mt-3 md:hidden">
 						<Dialog.Root>
+							<Dialog.Trigger asChild>
+								<button className="rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-[#C70039] focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500">
+									Baca selengkapnya
+								</button>
+							</Dialog.Trigger>
+
 							<Dialog.Portal>
 								<Dialog.Overlay className="data-[state=open]:animate-fade-in fixed inset-0 bg-black/40" />
 								<Dialog.Content className="data-[state=open]:animate-zoom-in fixed top-1/2 left-1/2 z-50 w-[92vw] max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl focus:outline-none">
@@ -79,9 +84,7 @@ export const Home = () => {
 
 	const goToDashboard = () => {
 		if (document.startViewTransition) {
-			document.startViewTransition(() => {
-				navigate("/pahlawan");
-			});
+			document.startViewTransition(() => navigate("/pahlawan"));
 		} else {
 			navigate("/pahlawan");
 		}
@@ -144,17 +147,17 @@ export const Home = () => {
 
 	return (
 		<>
-			<div className="flex h-dvh flex-col overflow-hidden bg-[#111110]">
+			<div className="flex min-h-dvh flex-col overflow-hidden bg-[#111110]">
 				<div className="mx-auto w-full max-w-screen-2xl flex-shrink-0">
-					<header className="flex items-center justify-between px-4 py-4 md:px-8 md:py-8">
+					<header className="flex items-center justify-between px-4 py-[max(12px,env(safe-area-inset-top))] md:px-8 md:py-8">
 						<a
 							href="/"
-							className="inline-flex items-center gap-2.5 text-2xl font-bold text-black md:text-3xl"
+							className="inline-flex items-center gap-2.5 text-2xl font-bold text-black"
 							aria-label="logo"
 						>
 							<svg
 								viewBox="0 0 266.66666 266.66666"
-								className="h-12 w-12 text-indigo-500"
+								className="h-10 w-10 text-indigo-500 sm:h-12 sm:w-12"
 								fill="currentColor"
 								xmlns="http://www.w3.org/2000/svg"
 							>
@@ -253,7 +256,7 @@ export const Home = () => {
 						</a>
 
 						<button
-							className="mt-4 mb-4 inline-flex h-10 w-28 cursor-pointer items-center justify-center rounded-xl bg-red-600 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#C70039] active:bg-[#900020] disabled:cursor-not-allowed disabled:bg-[#900020] sm:h-12 sm:w-32 sm:text-base md:text-lg"
+							className="mt-2 mb-2 inline-flex h-10 w-28 cursor-pointer items-center justify-center rounded-xl bg-red-600 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#C70039] active:bg-[#900020] disabled:cursor-not-allowed disabled:bg-[#900020] sm:h-11 sm:w-32 sm:text-base"
 							onClick={goToDashboard}
 							onKeyDown={(e) => {
 								if (e.key === "Enter" || e.key === " ") goToDashboard();
@@ -292,54 +295,66 @@ export const Home = () => {
 					</header>
 				</div>
 
-				<section className="relative mx-4 mb-4 flex flex-1 flex-col items-center justify-center overflow-hidden rounded-lg bg-gray-100 shadow-lg md:mx-8 md:mb-8">
+				<section className="relative mx-4 mb-4 flex flex-1 items-center justify-center overflow-hidden rounded-lg bg-gray-100 shadow-lg md:mx-8 md:mb-8">
 					<img
 						src="/bendera.avif"
 						loading="lazy"
 						alt="Pahlawan Nasional"
-						className="absolute inset-0 h-full w-full object-cover lg:object-[50%_85%] xl:object-[50%_85%]"
+						className="absolute inset-0 h-full w-full object-cover sm:object-center lg:object-[50%_85%]"
 					/>
-					<div className="relative z-10 flex flex-col items-center p-4 sm:max-w-xl">
-						<h1 className="mb-6 text-center text-4xl font-bold text-white mix-blend-overlay drop-shadow-[0_3px_12px_rgba(0,0,0,0.45)] sm:text-6xl md:mb-8 md:text-7xl lg:text-8xl xl:text-9xl">
+					<div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/25 to-transparent" />
+					<div className="relative z-10 mx-auto max-w-[min(96vw,1200px)] p-4">
+						<h1
+							className="mx-auto text-center font-extrabold text-white mix-blend-overlay drop-shadow-[0_3px_12px_rgba(0,0,0,0.45)]"
+							style={{
+								fontSize: "clamp(28px, 8vw, 96px)",
+								lineHeight: 1.05,
+								letterSpacing: "-0.02em",
+							}}
+						>
 							MENGENANG PAHLAWAN
 						</h1>
 					</div>
 				</section>
 			</div>
 
-			<div className="flex h-dvh flex-col overflow-hidden bg-[#111110]">
-				<section className="relative m-4 flex h-full flex-1 flex-col overflow-hidden rounded-lg bg-[#ECEEDF] shadow-lg md:m-8">
-					<div className="relative z-10 flex h-full w-full flex-col p-4 md:p-8">
-						<div className="grid h-full grid-cols-1 gap-6 md:grid-cols-2">
-							<div className="flex h-full flex-col">
-								<div className="relative aspect-video w-full flex-1 overflow-hidden rounded-2xl bg-black shadow-lg">
-									<iframe
-										className="absolute top-0 left-0 h-full w-full"
-										src={VIDEO_URL}
-										title="Pengantar Mengenang Pahlawan"
-										loading="lazy"
-										allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-										referrerPolicy="strict-origin-when-cross-origin"
-										allowFullScreen
-									/>
+			<div className="flex min-h-dvh flex-col overflow-hidden bg-[#111110]">
+				<section className="relative m-4 flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-[#ECEEDF] shadow-lg md:m-8">
+					<div className="relative z-10 flex min-h-0 w-full flex-1 flex-col p-4 md:p-8">
+						<div className="grid min-h-0 flex-1 grid-cols-1 gap-6 md:grid-cols-2">
+							<div className="flex min-h-0 flex-col">
+								<div className="relative w-full flex-1 overflow-hidden rounded-2xl bg-black shadow-lg">
+									<div className="aspect-video md:aspect-auto md:h-full">
+										<iframe
+											className="absolute top-0 left-0 h-full w-full"
+											src={VIDEO_URL}
+											title="Pengantar Mengenang Pahlawan"
+											loading="lazy"
+											allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+											referrerPolicy="strict-origin-when-cross-origin"
+											allowFullScreen
+										/>
+									</div>
 								</div>
 							</div>
 
-							<div className="flex h-full flex-col">
+							<div className="flex min-h-0 flex-col">
 								<Accordion.Root
 									type="single"
 									defaultValue="ai-heavy"
 									collapsible
-									className="flex w-full flex-1 flex-col overflow-hidden rounded-2xl bg-white shadow-sm"
+									className="flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-2xl bg-white shadow-sm"
 								>
-									{faqs.map((item) => (
-										<FaqItem
-											key={item.id}
-											value={item.id}
-											question={item.q}
-											answer={item.a}
-										/>
-									))}
+									<div className="min-h-0 flex-1 overflow-auto">
+										{faqs.map((item) => (
+											<FaqItem
+												key={item.id}
+												value={item.id}
+												question={item.q}
+												answer={item.a}
+											/>
+										))}
+									</div>
 								</Accordion.Root>
 							</div>
 						</div>

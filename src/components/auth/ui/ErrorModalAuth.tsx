@@ -1,5 +1,4 @@
 // src/components/auth/ui/ErrorModalAuth.tsx
-
 import { useEffect } from "react";
 
 import { Alert, Modal } from "@mantine/core";
@@ -26,21 +25,41 @@ export const ErrorModalAuth = ({ error, onClose }: ErrorModalProps) => {
 			withOverlay={false}
 			centered={false}
 			trapFocus={false}
+			lockScroll={false}
+			closeOnClickOutside
+			zIndex={1000}
 			size="auto"
 			styles={{
 				inner: {
 					display: "flex",
 					justifyContent: "center",
 					alignItems: "flex-start",
-					padding: 16,
+					paddingTop: "max(16px, env(safe-area-inset-top))",
+					paddingRight: "max(12px, env(safe-area-inset-right))",
+					paddingBottom: 12,
+					paddingLeft: 12,
 					pointerEvents: "none",
 				},
-				content: { margin: 0, pointerEvents: "all" },
+				content: {
+					margin: "0 auto",
+					pointerEvents: "all",
+					borderRadius: 12,
+					width: "auto",
+					maxWidth: "min(92vw, 420px)",
+					boxShadow: "0 10px 25px rgba(0,0,0,0.2), 0 4px 10px rgba(0,0,0,0.12)",
+				},
+				body: { padding: 0 },
 			}}
-			transitionProps={{ transition: "slide-down", duration: 150 }}
+			transitionProps={{
+				transition: "slide-down",
+				duration: 160,
+				timingFunction: "ease-out",
+			}}
 		>
 			<Alert
-				icon={<IconAlertTriangle size={20} />}
+				role="alert"
+				aria-live="assertive"
+				icon={<IconAlertTriangle size={18} stroke={2} />}
 				color="red"
 				variant="filled"
 				radius="md"
@@ -50,13 +69,19 @@ export const ErrorModalAuth = ({ error, onClose }: ErrorModalProps) => {
 						flexDirection: "column",
 						alignItems: "center",
 						textAlign: "center",
-						paddingTop: 2,
-						paddingRight: 20,
-						paddingBottom: 2,
-						paddingLeft: 20,
+						paddingTop: 8,
+						paddingRight: 16,
+						paddingBottom: 8,
+						paddingLeft: 16,
 					},
-					icon: { marginTop: 13, marginBottom: 10 },
-					message: { marginTop: 10, marginBottom: 10, fontSize: 16 },
+					icon: { marginTop: 6, marginBottom: 4 },
+					message: {
+						marginTop: 6,
+						marginBottom: 6,
+						fontSize: 14,
+						lineHeight: 1.45,
+						wordBreak: "break-word",
+					},
 				}}
 			>
 				{error}

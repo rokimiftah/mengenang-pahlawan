@@ -285,22 +285,27 @@ export function AuthenticationForm() {
 	);
 
 	return (
-		<Center h="100dvh">
+		<Center className="min-h-dvh px-4 py-6 sm:py-8">
 			<Paper
-				radius="md"
-				p="xl"
+				radius="lg"
 				withBorder
-				className="w-full max-w-md"
+				className="w-full max-w-[26rem] p-4 sm:max-w-md sm:p-6 md:max-w-lg md:p-8"
 				aria-labelledby="auth-title"
 				bg="dark"
 			>
-				<Text id="auth-title" size="md" fw={700} ta="center" mb="xl">
+				<Text
+					id="auth-title"
+					size="lg"
+					fw={700}
+					ta="center"
+					className="mb-6 sm:mb-8"
+				>
 					Mengenang Pahlawan
 				</Text>
 
 				{(type === "signIn" || type === "signUp") && (
 					<>
-						<Group grow mb="md" mt="md">
+						<Group grow className="mt-4 mb-2">
 							<GitHubButton
 								radius="xl"
 								onClick={handleGitHubLogin}
@@ -312,8 +317,7 @@ export function AuthenticationForm() {
 						<Divider
 							label="Atau lanjutkan dengan email"
 							labelPosition="center"
-							mt="xl"
-							mb="lg"
+							className="mt-6 mb-4 sm:mt-8 sm:mb-6"
 						/>
 					</>
 				)}
@@ -324,43 +328,44 @@ export function AuthenticationForm() {
 				>
 					<fieldset disabled={isLoading}>
 						{(type === "signIn" || type === "signUp" || type === "forgot") && (
-							<>
-								<Group mb="5">
-									<Text size="sm" fw={500}>
-										Email <span className="text-red-500">*</span>
-									</Text>
-								</Group>
+							<div className="space-y-2 sm:space-y-3">
+								<Text size="sm" fw={500}>
+									Email <span className="text-red-500">*</span>
+								</Text>
 								<TextInput
 									placeholder="nama@domain.com"
 									radius="md"
 									aria-label="Alamat email"
+									autoComplete="email"
+									size="md"
 									{...form.getInputProps("email")}
 								/>
-							</>
+							</div>
 						)}
 
 						{(type === "verify" || type === "reset") && email && (
-							<>
-								<Text ta="center" mb="xl">
+							<div className="space-y-2 sm:space-y-3">
+								<Text ta="center" className="mb-2 sm:mb-3">
 									Kode verifikasi telah dikirim ke {email}.
 								</Text>
-								<Group mb="5">
-									<Text size="sm" fw={500}>
-										Kode Verifikasi <span className="text-red-500">*</span>
-									</Text>
-								</Group>
+								<Text size="sm" fw={500}>
+									Kode Verifikasi <span className="text-red-500">*</span>
+								</Text>
 								<TextInput
 									placeholder="Masukkan 6 digit kode"
 									radius="md"
 									aria-label="Kode verifikasi"
+									inputMode="numeric"
+									maxLength={6}
+									size="md"
 									{...form.getInputProps("code")}
 								/>
-							</>
+							</div>
 						)}
 
 						{type === "signIn" && (
-							<>
-								<Group justify="space-between" mb="5" mt="25">
+							<div className="mt-6 space-y-2 sm:mt-7 sm:space-y-3">
+								<div className="flex items-center justify-between gap-2">
 									<Text size="sm" fw={500}>
 										Kata Sandi <span className="text-red-500">*</span>
 									</Text>
@@ -368,27 +373,29 @@ export function AuthenticationForm() {
 										href="#"
 										fz="xs"
 										fw={500}
-										onClick={(event) => {
-											event.preventDefault();
+										onClick={(e) => {
+											e.preventDefault();
 											toggleType("forgot");
 										}}
 										underline="hover"
 									>
 										Lupa kata sandi?
 									</Anchor>
-								</Group>
+								</div>
 								<PasswordInput
 									placeholder="••••••"
 									radius="md"
 									aria-label="Kata sandi"
+									autoComplete="current-password"
+									size="md"
 									{...form.getInputProps("password")}
 								/>
-							</>
+							</div>
 						)}
 
 						{type === "signUp" && (
 							<>
-								<Group mb="5" mt="25">
+								<Group mb="5" className="mt-6 sm:mt-7">
 									<Text size="sm" fw={500}>
 										Kata Sandi <span className="text-red-500">*</span>
 									</Text>
@@ -397,9 +404,11 @@ export function AuthenticationForm() {
 									placeholder="••••••"
 									radius="md"
 									aria-label="Kata sandi"
+									autoComplete="new-password"
+									size="md"
 									{...form.getInputProps("password")}
 								/>
-								<Group mb="5" mt="25">
+								<Group mb="5" className="mt-6">
 									<Text size="sm" fw={500}>
 										Konfirmasi Kata Sandi{" "}
 										<span className="text-red-500">*</span>
@@ -409,6 +418,8 @@ export function AuthenticationForm() {
 									placeholder="••••••"
 									radius="md"
 									aria-label="Konfirmasi kata sandi"
+									autoComplete="new-password"
+									size="md"
 									{...form.getInputProps("confirmPassword")}
 								/>
 								<PasswordStrength password={form.values.password} />
@@ -417,7 +428,7 @@ export function AuthenticationForm() {
 
 						{type === "reset" && (
 							<>
-								<Group mb="5" mt="25">
+								<Group mb="5" className="mt-6 sm:mt-7">
 									<Text size="sm" fw={500}>
 										Kata Sandi Baru <span className="text-red-500">*</span>
 									</Text>
@@ -426,6 +437,8 @@ export function AuthenticationForm() {
 									placeholder="••••••"
 									radius="md"
 									aria-label="Kata sandi baru"
+									autoComplete="new-password"
+									size="md"
 									{...form.getInputProps("newPassword")}
 								/>
 								<PasswordStrength password={form.values.newPassword} />
@@ -434,7 +447,7 @@ export function AuthenticationForm() {
 
 						<ErrorModalAuth error={error} onClose={() => setError(null)} />
 
-						<Group justify="space-between" mt="xl">
+						<Group className="mt-8 flex w-full flex-col-reverse gap-3 sm:mt-10 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
 							<Anchor
 								component="button"
 								type="button"
@@ -442,14 +455,9 @@ export function AuthenticationForm() {
 								underline="hover"
 								c="#a3a3a3"
 								onClick={() =>
-									toggleType(
-										type === "signIn"
-											? "signUp"
-											: type === "signUp"
-												? "signIn"
-												: "signIn",
-									)
+									toggleType(type === "signIn" ? "signUp" : "signIn")
 								}
+								className="text-center sm:text-left"
 							>
 								{type === "signIn"
 									? "Belum punya akun? Daftar"
@@ -457,12 +465,13 @@ export function AuthenticationForm() {
 										? "Sudah punya akun? Masuk"
 										: "Kembali ke Masuk"}
 							</Anchor>
+
 							<Button
 								type="submit"
 								radius="xl"
 								loading={isLoading}
 								loaderProps={{ color: "#000000" }}
-								className="w-32 bg-[#f5d90a] text-[#111110] transition-all duration-200 hover:bg-[#f5d90ae6]"
+								className="w-full bg-[#f5d90a] text-[#111110] transition-all duration-200 hover:bg-[#f5d90ae6] sm:w-36"
 							>
 								{type === "signIn"
 									? "Masuk"
