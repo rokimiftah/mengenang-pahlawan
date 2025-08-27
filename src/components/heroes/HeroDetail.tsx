@@ -114,7 +114,6 @@ function RecommendPanel({
 	onClose: () => void;
 }) {
 	const recommend = useAction(api.agent.recommendHeroes as any);
-
 	const [loading, setLoading] = useState(true);
 	const [recs, setRecs] = useState<any[]>([]);
 
@@ -157,7 +156,6 @@ function RecommendPanel({
 					Tutup
 				</button>
 			</div>
-
 			<div className="min-h-0 flex-1 overflow-y-auto p-4">
 				{loading && (
 					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
@@ -169,13 +167,11 @@ function RecommendPanel({
 						))}
 					</div>
 				)}
-
 				{!loading && recs.length === 0 && (
 					<div className="rounded border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
 						Tidak ada rekomendasi untuk saat ini.
 					</div>
 				)}
-
 				{!loading && recs.length > 0 && (
 					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
 						{recs.map((h: any) => (
@@ -231,7 +227,9 @@ function ChatRoleplayPanel({
 		setMsgs([
 			{
 				role: "assistant" as const,
-				content: `Ini simulasi edukatif berdasarkan sumber yang ada.\n[Fakta] — Silakan ajukan pertanyaan tentang perjuangan ${name}.\n[Interpretasi] — Aku akan menjawab dengan gaya naratif, namun tetap membedakan fakta dan interpretasi.`,
+				content: `Ini simulasi edukatif berdasarkan sumber yang ada.
+[Fakta] — Silakan ajukan pertanyaan tentang perjuangan ${name}.
+[Interpretasi] — Aku akan menjawab dengan gaya naratif, namun tetap membedakan fakta dan interpretasi.`,
 			},
 		]);
 	}, [name]);
@@ -239,37 +237,30 @@ function ChatRoleplayPanel({
 	useEffect(() => {
 		const el = listRef.current;
 		if (!el) return;
-
 		const behavior: ScrollBehavior = loading
 			? "auto"
 			: msgs.length > 1
 				? "smooth"
 				: "auto";
-
 		el.scrollTo({ top: el.scrollHeight, behavior });
 	}, [msgs.length, loading]);
 
 	async function send() {
 		const q = input.trim();
 		if (!q || loading) return;
-
 		setInput("");
 		setLoading(true);
-
 		setMsgs((prev) => [...prev, { role: "user" as const, content: q }]);
-
 		try {
 			const payloadHistory: ChatMsg[] = [
 				...msgs,
 				{ role: "user" as const, content: q },
 			];
-
 			const res = await ask({
 				slug,
 				message: q,
 				history: payloadHistory,
 			} as any);
-
 			setMsgs((prev) => [
 				...prev,
 				{ role: "assistant" as const, content: (res as any).reply },
@@ -293,7 +284,6 @@ function ChatRoleplayPanel({
 					Tutup
 				</button>
 			</div>
-
 			<div
 				ref={listRef}
 				className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4"
@@ -320,7 +310,6 @@ function ChatRoleplayPanel({
 					</div>
 				)}
 			</div>
-
 			<div className="flex items-end gap-2 border-t p-3">
 				<textarea
 					value={input}
@@ -351,14 +340,12 @@ function ChatRoleplayPanel({
 function QuizPanel({ slug, onClose }: { slug: string; onClose: () => void }) {
 	const generate = useAction(api.ai.generateAiQuiz);
 	const saveAttempt = useMutation(api.quizzes.recordAttempt);
-
 	const [loading, setLoading] = useState(false);
 	const [quiz, setQuiz] = useState<QuizPayload | null>(null);
 	const [idx, setIdx] = useState(0);
 	const [picked, setPicked] = useState<Record<string, string>>({});
 	const [locked, setLocked] = useState(false);
 	const [done, setDone] = useState(false);
-
 	const [award, setAward] = useState<null | {
 		awardedPoints: number;
 		practice: boolean;
@@ -385,13 +372,12 @@ function QuizPanel({ slug, onClose }: { slug: string; onClose: () => void }) {
 
 	const q = quiz?.questions[idx];
 	const total = quiz?.questions.length ?? 0;
-
 	const correctCount = useMemo(() => {
 		if (!quiz) return 0;
-		return quiz.questions.reduce((acc, qq) => {
-			const sel = picked[qq.id];
-			return acc + (sel && sel === qq.answerId ? 1 : 0);
-		}, 0);
+		return quiz.questions.reduce(
+			(acc, qq) => acc + (picked[qq.id] === qq.answerId ? 1 : 0),
+			0,
+		);
 	}, [picked, quiz]);
 
 	function pick(optId: string) {
@@ -420,9 +406,7 @@ function QuizPanel({ slug, onClose }: { slug: string; onClose: () => void }) {
 					isPerfect: res.isPerfect,
 					dailyRemaining: res.dailyRemaining,
 				});
-			} catch {
-				// ignore
-			}
+			} catch {}
 		}
 	}
 
@@ -444,7 +428,6 @@ function QuizPanel({ slug, onClose }: { slug: string; onClose: () => void }) {
 			<div className="flex items-center gap-3 border-b px-4 py-3">
 				<h3 className="text-base font-semibold text-zinc-900">Kuis Pahlawan</h3>
 			</div>
-
 			<div className="min-h-0 flex-1 overflow-y-auto p-4">
 				{loading && (
 					<div className="space-y-3">
@@ -454,7 +437,6 @@ function QuizPanel({ slug, onClose }: { slug: string; onClose: () => void }) {
 						<div className="h-9 w-full animate-pulse rounded bg-zinc-200" />
 					</div>
 				)}
-
 				{!loading && quiz && !done && q && (
 					<div className="space-y-4">
 						<div className="text-xs font-medium text-zinc-500">
@@ -463,7 +445,6 @@ function QuizPanel({ slug, onClose }: { slug: string; onClose: () => void }) {
 						<h4 className="text-base font-semibold text-zinc-900">
 							{q.prompt}
 						</h4>
-
 						<div className="space-y-2">
 							{q.options.map((op) => (
 								<Choice
@@ -476,7 +457,6 @@ function QuizPanel({ slug, onClose }: { slug: string; onClose: () => void }) {
 								/>
 							))}
 						</div>
-
 						{locked && q.explanation && (
 							<div className="rounded-md bg-zinc-50 px-3 py-2 text-xs text-zinc-600 ring-1 ring-zinc-200">
 								{q.explanation}
@@ -484,7 +464,6 @@ function QuizPanel({ slug, onClose }: { slug: string; onClose: () => void }) {
 						)}
 					</div>
 				)}
-
 				{!loading && quiz && done && (
 					<div className="space-y-4 text-center">
 						<div className="text-3xl font-bold text-zinc-900">
@@ -497,7 +476,6 @@ function QuizPanel({ slug, onClose }: { slug: string; onClose: () => void }) {
 									? "Bagus! 💪"
 									: "Terus berlatih! ✨"}
 						</div>
-
 						{award && (
 							<div className="mx-auto w-full max-w-md rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900 ring-1 ring-amber-200">
 								{award.practice ? (
@@ -524,7 +502,6 @@ function QuizPanel({ slug, onClose }: { slug: string; onClose: () => void }) {
 								)}
 							</div>
 						)}
-
 						<div className="mx-auto w-full max-w-md rounded-md bg-blue-50 px-3 py-2 text-sm text-blue-900 ring-1 ring-blue-200">
 							Ringkasan hasil kuis telah{" "}
 							<span className="font-semibold">dikirim ke email</span> Anda.
@@ -535,7 +512,6 @@ function QuizPanel({ slug, onClose }: { slug: string; onClose: () => void }) {
 					</div>
 				)}
 			</div>
-
 			{!loading && quiz && !done && (
 				<div className="flex items-center justify-end gap-2 border-t px-4 py-3">
 					<button
@@ -554,7 +530,6 @@ function QuizPanel({ slug, onClose }: { slug: string; onClose: () => void }) {
 					</Button>
 				</div>
 			)}
-
 			{!loading && quiz && done && (
 				<div className="flex items-center justify-center gap-2 border-t px-4 py-3">
 					<button
@@ -623,7 +598,6 @@ export function HeroDetail() {
 	const [, _navigate] = useLocation();
 	const [, params] = useRoute<{ slug: string }>("/pahlawan/:slug");
 	const [chatOpen, setChatOpen] = useState(false);
-
 	const hero = useQuery(
 		api.heroes.getBySlug,
 		params?.slug ? { slug: params.slug } : "skip",
@@ -662,28 +636,11 @@ export function HeroDetail() {
 
 	const bioSummary: string | undefined =
 		hero?.biography?.summary ?? hero?.raw?.biography?.summary ?? hero?.summary;
-
 	const bioHighlights: string[] =
 		hero?.biography?.highlights ?? hero?.raw?.biography?.highlights ?? [];
-
 	const [studentView, setStudentView] = useState<string | null>(null);
 	const simplify = useAction(api.ai.simplifySummary);
-
 	const [quizOpen, setQuizOpen] = useState(false);
-
-	useEffect(() => {
-		if (!hero?.slug) return;
-		try {
-			const key = "recent-slugs";
-			const cur = JSON.parse(localStorage.getItem(key) || "[]") as string[];
-			const next = [hero.slug, ...cur.filter((s) => s !== hero.slug)].slice(
-				0,
-				10,
-			);
-			localStorage.setItem(key, JSON.stringify(next));
-		} catch {}
-	}, [hero?.slug]);
-
 	const [recsOpen, setRecsOpen] = useState(false);
 
 	useEffect(() => {
@@ -702,7 +659,7 @@ export function HeroDetail() {
 	if (hero === undefined) {
 		return (
 			<div className="grid h-full w-full grid-cols-1 gap-4 md:grid-cols-5">
-				<div className="col-span-1 h-64 animate-pulse rounded-2xl bg-zinc-800/50 md:col-span-2 md:h-auto" />
+				<div className="hidden aspect-video animate-pulse rounded-2xl bg-zinc-800/50 md:col-span-2 md:block md:aspect-auto md:h-auto" />
 				<div className="col-span-1 h-full rounded-2xl bg-white p-4 md:col-span-3">
 					<div className="mb-3 h-7 w-2/3 animate-pulse rounded bg-zinc-200" />
 					<div className="mb-2 h-4 w-1/2 animate-pulse rounded bg-zinc-200" />
@@ -725,7 +682,7 @@ export function HeroDetail() {
 
 	return (
 		<>
-			<div className="mb-4 flex items-center">
+			<div className="mb-3 hidden items-center sm:mb-4 sm:flex">
 				<Breadcrumbs>
 					<Anchor
 						href="/pahlawan"
@@ -742,8 +699,9 @@ export function HeroDetail() {
 					</span>
 				</Breadcrumbs>
 			</div>
-			<div className="grid h-full min-h-0 w-full grid-cols-1 gap-4 md:grid-cols-5">
-				<div className="min-h[260px] relative col-span-1 overflow-hidden rounded-2xl ring-1 ring-black/10 md:col-span-2 md:h-full md:min-h-0">
+
+			<div className="flex h-full min-h-0 w-full flex-col gap-4 md:grid md:grid-cols-5">
+				<div className="relative col-span-1 hidden w-full overflow-hidden rounded-2xl ring-1 ring-black/10 md:col-span-2 md:block md:aspect-auto md:h-full">
 					<div
 						ref={scrollerRef}
 						className="flex h-full w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden scroll-smooth [scrollbar-width:none]"
@@ -764,7 +722,6 @@ export function HeroDetail() {
 							</div>
 						))}
 					</div>
-
 					<button
 						type="button"
 						onClick={() => goTo(idx - 1)}
@@ -811,7 +768,6 @@ export function HeroDetail() {
 							/>
 						</svg>
 					</button>
-
 					<div className="absolute right-0 bottom-3 left-0 flex items-center justify-center gap-2">
 						{images.map((_, i) => (
 							<button
@@ -830,13 +786,31 @@ export function HeroDetail() {
 						))}
 					</div>
 				</div>
-				<div className="relative col-span-1 flex min-h-0 flex-col rounded-2xl bg-white p-4 md:col-span-3">
-					<div className="mb-2 flex items-start justify-between gap-3">
-						<h2 className="text-xl font-semibold text-zinc-900">{hero.name}</h2>
-						<div className="flex items-center gap-2">
+
+				<div className="relative col-span-1 flex min-h-0 flex-col rounded-2xl bg-white p-4 md:col-span-3 md:p-6">
+					<div className="mb-5 sm:hidden">
+						<h2 className="text-center text-2xl font-bold tracking-tight text-zinc-900">
+							{hero.name}
+						</h2>
+
+						<div className="mt-3 flex flex-wrap items-center justify-center gap-2.5">
+							{(hero.titles ?? []).map((t) => (
+								<SoftRedBadge key={t}>{t}</SoftRedBadge>
+							))}
+						</div>
+
+						{Array.isArray(hero.raw?.aliases) &&
+							hero.raw.aliases.length > 0 && (
+								<div className="mt-2 flex justify-center">
+									<AliasBadge text={`Alias: ${hero.raw.aliases.join(", ")}`} />
+								</div>
+							)}
+
+						<div className="mt-4 mb-1 flex flex-col items-stretch gap-2">
 							<Button
-								size="sm"
+								size="compact-sm"
 								variant="default"
+								className="h-9 w-full rounded-md px-3 text-[13px] !font-medium"
 								onClick={async () => {
 									const res = await simplify({
 										text: bioSummary ?? "",
@@ -848,23 +822,61 @@ export function HeroDetail() {
 								Ringkas (Pelajar)
 							</Button>
 							<Button
-								size="sm"
+								size="compact-sm"
 								variant="default"
+								className="h-9 w-full rounded-md px-3 text-[13px] !font-medium"
 								onClick={() => setRecsOpen(true)}
 							>
-								Disarankan untukmu
+								Disarankan
 							</Button>
 							<Button
-								size="sm"
+								size="compact-sm"
 								onClick={() => setQuizOpen(true)}
-								className="cursor-pointer bg-yellow-400 text-black hover:bg-yellow-300"
+								className="h-9 w-full cursor-pointer rounded-md bg-yellow-400 px-3 text-[13px] !font-medium text-black hover:bg-yellow-300"
 							>
 								Mulai Kuis
 							</Button>
 						</div>
 					</div>
 
-					<div className="mb-4 flex flex-wrap gap-2">
+					<div className="mb-4 hidden sm:flex sm:flex-col md:flex-row md:items-start md:justify-between">
+						<h2 className="text-2xl font-bold tracking-tight text-zinc-900">
+							{hero.name}
+						</h2>
+						<div className="mt-3 flex flex-col items-stretch gap-2.5 sm:mt-2 md:mt-0 md:flex-row md:items-center">
+							<Button
+								size="md"
+								variant="default"
+								className="h-11 w-full rounded-lg text-[15px] !font-medium sm:w-auto"
+								onClick={async () => {
+									const res = await simplify({
+										text: bioSummary ?? "",
+										maxSentences: 3,
+									} as any);
+									setStudentView((res as any)?.summary || null);
+								}}
+							>
+								Ringkas (Pelajar)
+							</Button>
+							<Button
+								size="md"
+								variant="default"
+								className="h-11 w-full rounded-lg text-[15px] !font-medium sm:w-auto"
+								onClick={() => setRecsOpen(true)}
+							>
+								Disarankan
+							</Button>
+							<Button
+								size="md"
+								className="h-11 w-full cursor-pointer rounded-lg bg-yellow-400 text-[15px] !font-medium text-black hover:bg-yellow-300 sm:w-auto"
+								onClick={() => setQuizOpen(true)}
+							>
+								Mulai Kuis
+							</Button>
+						</div>
+					</div>
+
+					<div className="mb-5 hidden flex-wrap gap-2.5 sm:flex">
 						{(hero.titles ?? []).map((t) => (
 							<SoftRedBadge key={t}>{t}</SoftRedBadge>
 						))}
@@ -874,51 +886,53 @@ export function HeroDetail() {
 							)}
 					</div>
 
-					<section className="mb-4">
-						<h3 className="mb-2 text-sm font-semibold tracking-wide text-zinc-500 uppercase">
-							Biografi Singkat
-						</h3>
-						{studentView ? (
-							<div className="space-y-2">
-								<p className="text-zinc-700">{studentView}</p>
-								<div className="text-xs text-zinc-500">
-									Tampilan pelajar — diringkas oleh AI.
-									<button
-										type="button"
-										className="ml-2 cursor-pointer underline"
-										onClick={() => setStudentView(null)}
-									>
-										Tampilkan versi asli
-									</button>
+					<div className="min-h-0 flex-1 space-y-6 overflow-y-auto pr-2">
+						<section>
+							<h3 className="mb-2 text-sm font-semibold tracking-wide text-zinc-600 uppercase">
+								Biografi Singkat
+							</h3>
+							{studentView ? (
+								<div className="space-y-2 text-[15px] leading-relaxed">
+									<p className="max-w-prose text-zinc-700">{studentView}</p>
+									<div className="text-xs text-zinc-500">
+										Tampilan pelajar — diringkas oleh AI.
+										<button
+											type="button"
+											className="ml-2 cursor-pointer underline"
+											onClick={() => setStudentView(null)}
+										>
+											Tampilkan versi asli
+										</button>
+									</div>
 								</div>
-							</div>
-						) : (
-							<p className="text-zinc-700">{bioSummary ?? "—"}</p>
-						)}
-					</section>
+							) : (
+								<p className="max-w-prose text-[15px] leading-relaxed text-zinc-700">
+									{bioSummary ?? "—"}
+								</p>
+							)}
+						</section>
 
-					<section className="mb-4">
-						<h3 className="mb-2 text-sm font-semibold tracking-wide text-zinc-500 uppercase">
-							Sorotan Perjuangan
-						</h3>
-						{bioHighlights.length ? (
-							<ul className="list-disc space-y-1 pl-5 text-zinc-700">
-								{bioHighlights.map((h: string, i: number) => (
-									<li key={i}>{h}</li>
-								))}
-							</ul>
-						) : (
-							<p className="text-zinc-500">—</p>
-						)}
-					</section>
+						<section>
+							<h3 className="mb-2 text-sm font-semibold tracking-wide text-zinc-600 uppercase">
+								Sorotan Perjuangan
+							</h3>
+							{bioHighlights.length ? (
+								<ul className="list-disc space-y-2 pl-5 text-[15px] leading-relaxed text-zinc-700">
+									{bioHighlights.map((h: string, i: number) => (
+										<li key={i}>{h}</li>
+									))}
+								</ul>
+							) : (
+								<p className="text-[15px] leading-relaxed text-zinc-500">—</p>
+							)}
+						</section>
 
-					<div className="min-h-0 flex-1 overflow-y-auto pr-1">
-						<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+						<div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
 							<section>
-								<h3 className="mb-2 text-sm font-semibold tracking-wide text-zinc-500 uppercase">
+								<h3 className="mb-1.5 text-sm font-semibold tracking-wide text-zinc-600 uppercase">
 									Kelahiran
 								</h3>
-								<div className="text-zinc-700">
+								<div className="text-[15px] leading-relaxed text-zinc-700">
 									<div>{fmtDate(hero.birth?.date)}</div>
 									<div className="text-zinc-500">
 										{hero.birth?.place ?? "—"}
@@ -927,10 +941,10 @@ export function HeroDetail() {
 							</section>
 
 							<section>
-								<h3 className="mb-2 text-sm font-semibold tracking-wide text-zinc-500 uppercase">
+								<h3 className="mb-1.5 text-sm font-semibold tracking-wide text-zinc-600 uppercase">
 									Wafat
 								</h3>
-								<div className="text-zinc-700">
+								<div className="text-[15px] leading-relaxed text-zinc-700">
 									<div>{fmtDate(hero.death?.date)}</div>
 									<div className="text-zinc-500">
 										{hero.death?.place ?? "—"}
@@ -939,10 +953,10 @@ export function HeroDetail() {
 							</section>
 
 							<section className="sm:col-span-2">
-								<h3 className="mb-2 text-sm font-semibold tracking-wide text-zinc-500 uppercase">
+								<h3 className="mb-1.5 text-sm font-semibold tracking-wide text-zinc-600 uppercase">
 									Pengakuan
 								</h3>
-								<div className="text-zinc-700">
+								<div className="text-[15px] leading-relaxed text-zinc-700">
 									<div>{hero.recognition?.basis ?? "—"}</div>
 									<div className="text-zinc-500">
 										{fmtDate(hero.recognition?.date)}
@@ -951,41 +965,42 @@ export function HeroDetail() {
 							</section>
 
 							<section className="sm:col-span-2">
-								<h3 className="mb-2 text-sm font-semibold tracking-wide text-zinc-500 uppercase">
+								<h3 className="mb-1.5 text-sm font-semibold tracking-wide text-zinc-600 uppercase">
 									Pendidikan
 								</h3>
 								{hero.education?.length ? (
-									<ul className="list-disc space-y-1 pl-5 text-zinc-700">
+									<ul className="list-disc space-y-2 pl-5 text-[15px] leading-relaxed text-zinc-700">
 										{hero.education.map((e, i) => (
 											<li key={i}>{e}</li>
 										))}
 									</ul>
 								) : (
-									<p className="text-zinc-500">—</p>
+									<p className="text-[15px] leading-relaxed text-zinc-500">—</p>
 								)}
 							</section>
 
 							<section className="sm:col-span-2">
-								<h3 className="mb-2 text-sm font-semibold tracking-wide text-zinc-500 uppercase">
+								<h3 className="mb-1.5 text-sm font-semibold tracking-wide text-zinc-600 uppercase">
 									Warisan
 								</h3>
 								{hero.legacy?.length ? (
-									<ul className="list-disc space-y-1 pl-5 text-zinc-700">
+									<ul className="list-disc space-y-2 pl-5 text-[15px] leading-relaxed text-zinc-700">
 										{hero.legacy.map((e, i) => (
 											<li key={i}>{e}</li>
 										))}
 									</ul>
 								) : (
-									<p className="text-zinc-500">—</p>
+									<p className="text-[15px] leading-relaxed text-zinc-500">—</p>
 								)}
 							</section>
 						</div>
 					</div>
+
 					<button
 						type="button"
 						aria-label={`Ngobrol dengan ${hero.name}`}
 						onClick={() => setChatOpen(true)}
-						className="absolute right-4 bottom-4 z-20 flex h-12 cursor-pointer items-center gap-2 rounded-full bg-yellow-400 px-4 text-black shadow-lg ring-1 ring-black/10 transition hover:bg-yellow-300"
+						className="absolute right-4 bottom-4 z-20 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-yellow-400 text-black shadow-lg ring-1 ring-black/10 transition hover:bg-yellow-300 md:w-auto md:px-4"
 					>
 						<svg
 							width="20"
@@ -1002,11 +1017,12 @@ export function HeroDetail() {
 								strokeLinejoin="round"
 							/>
 						</svg>
-						<span className="text-sm font-medium">
+						<span className="hidden text-sm font-medium md:ml-2 md:inline">
 							Yuk ngobrol dengan {hero.name}
 						</span>
 					</button>
 				</div>
+
 				<QuizModal open={quizOpen} onClose={() => setQuizOpen(false)}>
 					<QuizPanel slug={hero.slug} onClose={() => setQuizOpen(false)} />
 				</QuizModal>
