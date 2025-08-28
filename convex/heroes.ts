@@ -51,7 +51,8 @@ const slugify = (name: string) =>
 		.replace(/-+/g, "-");
 
 const inferEra = (birthDate?: string) => {
-	const year = birthDate ? Number(String(birthDate).slice(0, 4)) : NaN;
+	const m = /(\d{4})/.exec(birthDate || "");
+	const year = m ? Number(m[1]) : NaN;
 	if (!Number.isFinite(year)) return "Pergerakan Nasional";
 	if (year < 1900) return "Perang Kolonial";
 	if (year < 1942) return "Pergerakan Nasional";
@@ -169,7 +170,7 @@ export const list = query({
 		limit: v.optional(v.number()),
 	},
 	handler: async (ctx, args) => {
-		const limit = Math.max(1, Math.min(200, args.limit ?? 60));
+		const limit = Math.max(1, Math.min(200, args.limit ?? 200));
 
 		const all = await ctx.db.query("heroes").collect();
 

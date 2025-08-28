@@ -157,7 +157,7 @@ export function HeroShelf() {
 		return () => window.removeEventListener("resize", onResize);
 	}, []);
 
-	const heroes = useQuery(api.heroes.list, { q: filters.q, era });
+	const heroes = useQuery(api.heroes.list, { q: filters.q, era, limit: 200 });
 
 	const pages = useMemo<Hero[][]>(() => {
 		const list = heroes ?? [];
