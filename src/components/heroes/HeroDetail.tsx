@@ -835,9 +835,9 @@ export function HeroDetail() {
 							)}
 					</div>
 
-					<div className="min-h-0 flex-1 overflow-y-auto scroll-smooth pr-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+					<div className="min-h-0 flex-1 overflow-y-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 						<div className="mb-5 sm:hidden">
-							<h2 className="text-center text-3xl font-bold tracking-tight text-zinc-900">
+							<h2 className="text-center text-3xl font-bold tracking-tight break-words text-zinc-900">
 								{hero.name}
 							</h2>
 
