@@ -701,7 +701,6 @@ export function HeroDetail() {
 			</div>
 
 			<div className="flex h-full min-h-0 w-full flex-col gap-4 md:grid md:grid-cols-5">
-				{/* Kiri: slider gambar (hidden di mobile) */}
 				<div className="relative col-span-1 hidden w-full overflow-hidden rounded-2xl ring-1 ring-black/10 md:col-span-2 md:block md:aspect-auto md:h-full">
 					<div
 						ref={scrollerRef}
@@ -788,9 +787,7 @@ export function HeroDetail() {
 					</div>
 				</div>
 
-				{/* Kanan: panel detail (TIDAK scroll), hanya isi di dalamnya yang scroll */}
 				<div className="relative col-span-1 flex min-h-0 flex-col rounded-2xl bg-white p-4 md:col-span-3 md:p-6">
-					{/* Header + aksi di ≥sm (tetap di luar area scroll) */}
 					<div className="mb-4 hidden sm:flex sm:flex-col md:flex-row md:items-start md:justify-between">
 						<h2 className="text-3xl font-bold tracking-tight text-zinc-900">
 							{hero.name}
@@ -828,7 +825,6 @@ export function HeroDetail() {
 						</div>
 					</div>
 
-					{/* Badge/alias di ≥sm (tetap di luar area scroll) */}
 					<div className="mb-5 hidden flex-wrap gap-2.5 sm:flex">
 						{(hero.titles ?? []).map((t) => (
 							<SoftRedBadge key={t}>{t}</SoftRedBadge>
@@ -839,9 +835,7 @@ export function HeroDetail() {
 							)}
 					</div>
 
-					{/* === AREA YANG SCROLL === */}
 					<div className="min-h-0 flex-1 overflow-y-auto scroll-smooth pr-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-						{/* ⤵️ Blok MOBILE dipindah ke DALAM area scroll */}
 						<div className="mb-5 sm:hidden">
 							<h2 className="text-center text-3xl font-bold tracking-tight text-zinc-900">
 								{hero.name}
@@ -895,7 +889,6 @@ export function HeroDetail() {
 							</div>
 						</div>
 
-						{/* Konten lain yang ikut scroll */}
 						<div className="space-y-6">
 							<section>
 								<h3 className="mb-2 text-sm font-semibold tracking-wide text-zinc-600 uppercase">
@@ -1010,9 +1003,7 @@ export function HeroDetail() {
 							</div>
 						</div>
 					</div>
-					{/* === /AREA YANG SCROLL === */}
 
-					{/* Tombol chat tetap di pojok panel (tidak ikut scroll area dalam) */}
 					<button
 						type="button"
 						aria-label={`Ngobrol dengan ${hero.name}`}
@@ -1040,7 +1031,6 @@ export function HeroDetail() {
 					</button>
 				</div>
 
-				{/* Modals */}
 				<QuizModal open={quizOpen} onClose={() => setQuizOpen(false)}>
 					<QuizPanel slug={hero.slug} onClose={() => setQuizOpen(false)} />
 				</QuizModal>
