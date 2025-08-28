@@ -55,7 +55,6 @@ export function UserMenu() {
 							size={48}
 							className="rounded-full bg-white"
 							alt={hasName ? name : email || "User"}
-							title={hasName ? name : email}
 						>
 							{!image ? initials : null}
 						</Avatar>
