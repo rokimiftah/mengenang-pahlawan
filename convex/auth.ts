@@ -117,8 +117,12 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 				if (args.type === "oauth" && !existingUser.emailVerificationTime) {
 					updates.emailVerificationTime = Date.now();
 				}
-				if (image && image !== existingUser.image) updates.image = image;
-				if (name && name !== existingUser.name) updates.name = name;
+				if (image && !existingUser.image) {
+					updates.image = image;
+				}
+				if (name && !existingUser.name) {
+					updates.name = name;
+				}
 
 				if (Object.keys(updates).length > 0) {
 					await ctx.db.patch(existingUser._id, updates);

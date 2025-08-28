@@ -14,6 +14,7 @@ export default defineSchema({
 		email: v.optional(v.string()),
 		emailVerificationTime: v.optional(v.number()),
 		linkedProviders: v.optional(v.array(v.string())),
+		storageId: v.optional(v.string()),
 	}).index("email", ["email"]),
 
 	heroes: defineTable({

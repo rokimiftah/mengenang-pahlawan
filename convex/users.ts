@@ -85,3 +85,29 @@ export const checkUserProvider = query({
 		return providers;
 	},
 });
+
+export const generateUploadUrl = mutation(async (ctx) => {
+	return await ctx.storage.generateUploadUrl();
+});
+
+export const updateUserProfile = mutation({
+	args: {
+		name: v.optional(v.string()),
+		storageId: v.optional(v.string()),
+	},
+	handler: async (ctx, { name, storageId }) => {
+		const userId = await getAuthUserId(ctx);
+		if (!userId) throw new ConvexError("Not authenticated");
+
+		let imageUrl: string | undefined;
+		if (storageId) {
+			const url = await ctx.storage.getUrl(storageId);
+			imageUrl = url ?? undefined;
+		}
+
+		await ctx.db.patch(userId, {
+			name: name,
+			...(imageUrl && { image: imageUrl, storageId }),
+		});
+	},
+});
