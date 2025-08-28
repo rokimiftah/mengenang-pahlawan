@@ -110,8 +110,16 @@ export function EditProfileModal({
 	return (
 		<Dialog.Root open={opened} onOpenChange={onClose}>
 			<Dialog.Portal>
-				<Dialog.Overlay className="data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" />
-				<Dialog.Content className="data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 fixed top-1/2 left-1/2 z-50 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-6 shadow-lg">
+				<Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity duration-300 data-[state=closed]:opacity-0 data-[state=open]:opacity-100" />
+
+				<Dialog.Content
+					className={clsx(
+						"fixed top-1/2 left-1/2 z-50 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-6 shadow-lg",
+						"transition-all duration-300 ease-out",
+						"data-[state=open]:scale-100 data-[state=open]:opacity-100",
+						"data-[state=closed]:scale-95 data-[state=closed]:opacity-0",
+					)}
+				>
 					<VisuallyHidden.Root asChild>
 						<Dialog.Title>Edit Profil</Dialog.Title>
 					</VisuallyHidden.Root>
@@ -177,6 +185,15 @@ export function EditProfileModal({
 						</div>
 
 						<div className="flex justify-end gap-4">
+							<Dialog.Close asChild>
+								<button
+									type="button"
+									disabled={isSubmitting}
+									className="cursor-pointer rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+								>
+									Batal
+								</button>
+							</Dialog.Close>
 							<button
 								type="submit"
 								disabled={!canSubmit}
