@@ -345,7 +345,7 @@ export function AuthenticationForm() {
 
 						{(type === "verify" || type === "reset") && email && (
 							<div className="space-y-2 sm:space-y-3">
-								<Text ta="center" className="mb-2 sm:mb-3">
+								<Text ta="center" className="mb-8 sm:mb-10">
 									Kode verifikasi telah dikirim ke {email}.
 								</Text>
 								<Text size="sm" fw={500}>
