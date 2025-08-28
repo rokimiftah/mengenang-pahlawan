@@ -9,7 +9,7 @@ import { api } from "@convex/_generated/api";
 import { notifications } from "@mantine/notifications";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 import * as Dialog from "@radix-ui/react-dialog";
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden"; // <-- Import VisuallyHidden
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { IconUpload } from "@tabler/icons-react";
 
 export function EditProfileModal({
@@ -27,7 +27,6 @@ export function EditProfileModal({
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	// Reset state setiap kali modal dibuka agar data selalu baru
 	useEffect(() => {
 		if (opened && user) {
 			setName(user.name ?? "");
@@ -35,13 +34,11 @@ export function EditProfileModal({
 		}
 	}, [opened, user]);
 
-	// URL pratinjau untuk avatar yang baru diunggah
 	const previewUrl = useMemo(
 		() => (avatarFile ? URL.createObjectURL(avatarFile) : null),
 		[avatarFile],
 	);
 
-	// Membersihkan URL objek saat komponen dilepas untuk mencegah memory leak
 	useEffect(() => {
 		return () => {
 			if (previewUrl) {
@@ -54,7 +51,6 @@ export function EditProfileModal({
 		const file = event.target.files?.[0];
 		if (!file) return;
 
-		// Validasi ukuran file (maksimal 5MB)
 		if (file.size > 5 * 1024 * 1024) {
 			notifications.show({
 				title: "Ukuran File Terlalu Besar",
@@ -116,7 +112,6 @@ export function EditProfileModal({
 			<Dialog.Portal>
 				<Dialog.Overlay className="data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" />
 				<Dialog.Content className="data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 fixed top-1/2 left-1/2 z-50 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-6 shadow-lg">
-					{/* --- PERBAIKAN AKSESIBILITAS --- */}
 					<VisuallyHidden.Root asChild>
 						<Dialog.Title>Edit Profil</Dialog.Title>
 					</VisuallyHidden.Root>
@@ -126,7 +121,6 @@ export function EditProfileModal({
 							sudah selesai.
 						</Dialog.Description>
 					</VisuallyHidden.Root>
-					{/* --- AKHIR PERBAIKAN --- */}
 
 					<form onSubmit={handleSubmit} className="space-y-6">
 						<div className="flex flex-col items-center gap-4">
