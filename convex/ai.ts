@@ -5,7 +5,7 @@ import { v } from "convex/values";
 
 import { api } from "./_generated/api";
 import { action } from "./_generated/server";
-import { generateText } from "./lib/lunos";
+import { generateText } from "./llm";
 
 type QuizOption = { id: string; text: string };
 type QuizQuestion = {
@@ -59,16 +59,26 @@ export const generateAiQuiz = action({
 			hero.biography?.highlights ?? hero.raw?.biography?.highlights ?? [];
 
 		const prompt = `
-			Buat ${num} soal pilihan ganda (A/B/C) tentang pahlawan "${hero.name}".
-			Gunakan materi:
-			Ringkasan: ${summary}
-			Sorotan: ${highlights.join(", ")}
+			Anda adalah seorang guru sejarah yang kreatif. Buat ${num} soal pilihan ganda (A/B/C) yang bervariasi dan menarik tentang pahlawan "${hero.name}".
+			Setiap kali Anda membuat soal, usahakan untuk menggunakan gaya dan jenis pertanyaan yang berbeda.
 
-			Kembalikan JSON ketat:
-			{"questions":[{"prompt":"...","choices":["A ...","B ...","C ..."],"answerIndex":0,"explanation":"..."}]}
+			Gunakan materi berikut sebagai sumber utama:
+			- Ringkasan: ${summary}
+			- Sorotan Penting: ${highlights.join(", ")}
+
+			Jenis pertanyaan yang bisa dibuat:
+			1.  **Faktual**: Tentang tanggal, tempat, atau peristiwa spesifik.
+			2.  **Konseptual**: Tentang peran, gagasan, atau dampak perjuangan.
+			3.  **Kutipan/Alias**: Jika ada, tanyakan tentang makna julukan atau kutipan terkenal.
+			4.  **Sebab-Akibat**: Mengapa suatu peristiwa terjadi atau apa dampaknya.
+
+			Pastikan pilihan jawaban pengecoh (distraktor) masuk akal namun salah.
+
+			Kembalikan dalam format JSON yang ketat seperti ini, tanpa teks tambahan:
+			{"questions":[{"prompt":"...","choices":["A ...","B ...","C ..."],"answerIndex":0,"explanation":"Penjelasan singkat mengapa jawaban ini benar..."}]}
 		`.trim();
 
-		const text = await generateText(prompt, 0.3);
+		const text = await generateText(prompt, 0.7);
 
 		let parsed: any = {};
 		try {

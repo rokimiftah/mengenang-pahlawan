@@ -12,7 +12,6 @@
 		"@auth/core": "0.37.0",
 		"@convex-dev/auth": "0.0.88",
 		"@convex-dev/resend": "0.1.7",
-		"@lunos/client": "^1.4.0",
 		"@mantine/charts": "8.2.1",
 		"@mantine/core": "8.2.1",
 		"@mantine/dates": "8.2.1",

@@ -5,7 +5,7 @@ import { v } from "convex/values";
 
 import { api } from "./_generated/api";
 import { action } from "./_generated/server";
-import { generateTextUnli } from "./lib/unli";
+import { generateText } from "./llm";
 
 type HeroLite = {
 	slug: string;
@@ -68,7 +68,7 @@ export const recommendHeroes = action({
 			{"slugs":["slug1","slug2","slug3"]}
 		`.trim();
 
-		const out = await generateTextUnli(prompt, 0.2);
+		const out = await generateText(prompt, 0.2);
 
 		let picks: string[] = [];
 		try {
@@ -145,7 +145,7 @@ export const chatAsHero = action({
 			Tidak relevan: matematika umum, coding, topik pop culture modern, tokoh lain tanpa kaitan, hal di luar sejarah ${hero.name}.
 		`.trim();
 
-		const judgeOut = await generateTextUnli(judgePrompt, 0);
+		const judgeOut = await generateText(judgePrompt, 0);
 		const judge = safeJson<{ relevant?: boolean; reason?: string }>(judgeOut, {
 			relevant: true,
 		});
@@ -185,7 +185,7 @@ export const chatAsHero = action({
 			Batas 4-6 kalimat. Bahasa Indonesia sopan & mudah dipahami.
 		`.trim();
 
-		const reply = (await generateTextUnli(prompt, 0.7)).trim();
+		const reply = (await generateText(prompt, 0.7)).trim();
 		return {
 			reply:
 				reply ||
