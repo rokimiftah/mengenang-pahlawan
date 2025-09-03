@@ -3,12 +3,13 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 
 import { v } from "convex/values";
+import { Resend as ResendAPI } from "resend";
 
 import { getAuthUserId } from "@convex-dev/auth/server";
 
+import { QuizResultEmail } from "../src/components/points/templates/QuizResultEmail";
 import { internal } from "./_generated/api";
 import { internalAction, mutation } from "./_generated/server";
-import { sendMailryEmailHTTPNotifications } from "./mailry/mailryHttp";
 
 type Option = { id: string; text: string };
 type Question = {
@@ -382,38 +383,6 @@ export const _sendQuizResultEmail = internalAction({
 
 		const subject = `Hasil Kuis Mengenang Pahlawan: ${heroName}`;
 
-		const html = `
-			<html>
-			<body style="font-family: Inter, Arial, sans-serif; background:#f8fafc; padding:24px;">
-				<div style="max-width:600px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;">
-				<h2 style="margin:0 0 12px;color:#111827;">Hasil Kuis Pahlawan</h2>
-				<p style="margin:0 0 16px;color:#374151;">
-					Hai${userName ? ` ${userName}` : ""}, berikut ringkasan hasil kuis Anda.
-				</p>
-				<div style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;">
-					<p style="margin:0 0 6px;"><strong>Tokoh:</strong> ${heroName}</p>
-					<p style="margin:0 0 6px;"><strong>Skor:</strong> ${correct}/${total}</p>
-					${
-						practice
-							? `<p style="margin:0 0 6px;"><strong>Mode:</strong> Latihan (tidak ada poin)</p>`
-							: `<p style="margin:0 0 6px;"><strong>Poin:</strong> +${awarded}</p>`
-					}
-					${
-						breakdown && Object.keys(breakdown).length
-							? `<p style="margin:6px 0 0;color:#6b7280;">Rincian: ${Object.entries(
-									breakdown,
-								)
-									.map(([k, v]) => `${k} ${v}`)
-									.join(", ")}</p>`
-							: ""
-					}
-					<p style="margin:6px 0 0;color:#6b7280;">Waktu: ${new Date().toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })}</p>
-				</div>
-				<p style="margin:16px 0 0;color:#4b5563;">Terus semangat belajar!</p>
-				</div>
-			</body>
-			</html>`.trim();
-
 		const text = [
 			`Hai${userName ? ` ${userName}` : ""},`,
 			`Hasil kuis Anda untuk tokoh ${heroName}:`,
@@ -434,11 +403,31 @@ export const _sendQuizResultEmail = internalAction({
 			`Terus semangat belajar!`,
 		].join("\n");
 
-		await sendMailryEmailHTTPNotifications({
-			to: email,
+		const resend = new ResendAPI(process.env.MAIL_API_KEY);
+		const sentAtText = new Date().toLocaleString("id-ID", {
+			dateStyle: "medium",
+			timeStyle: "short",
+		});
+
+		const { error } = await resend.emails.send({
+			from: "Mengenang Pahlawan <notifications@mengenangpahlawan.web.id>",
+			to: [email],
 			subject,
-			html,
+			react: QuizResultEmail({
+				userName: userName ?? undefined,
+				heroName,
+				total,
+				correct,
+				awarded,
+				practice,
+				breakdown: (breakdown ?? {}) as Record<string, number>,
+				sentAtText,
+			}),
 			text,
 		});
+
+		if (error) {
+			throw new Error(`Could not send email: ${error.message}`);
+		}
 	},
 });
