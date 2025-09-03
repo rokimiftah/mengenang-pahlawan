@@ -10,8 +10,7 @@ import GitHub from "@auth/core/providers/github";
 import { Password } from "@convex-dev/auth/providers/Password";
 import { convexAuth } from "@convex-dev/auth/server";
 
-import { OTP } from "./mailry/OTP";
-import { OTPPasswordReset } from "./mailry/OTPPasswordReset";
+import { otpPasswordReset, otpVerificationEmail } from "./otp";
 
 const PasswordSchema = z
 	.string()
@@ -65,8 +64,8 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 		}),
 		Password({
 			id: "password",
-			verify: OTP,
-			reset: OTPPasswordReset,
+			verify: otpVerificationEmail,
+			reset: otpPasswordReset,
 			profile: (params) => {
 				if (typeof params.email !== "string") {
 					throw new ConvexError("Email is required");
