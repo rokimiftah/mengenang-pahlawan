@@ -399,6 +399,7 @@ export const _sendQuizResultEmail = internalAction({
 			`Waktu: ${new Date().toLocaleString("id-ID", {
 				dateStyle: "medium",
 				timeStyle: "short",
+				timeZone: "Asia/Jakarta",
 			})}`,
 			`Terus semangat belajar!`,
 		].join("\n");
