@@ -1,4 +1,4 @@
-// src/components/auth/template/VerificationCodeEmail.tsx
+// src/components/auth/templates/PasswordResetEmail.tsx
 
 import {
 	Body,
@@ -10,26 +10,26 @@ import {
 	Text,
 } from "@react-email/components";
 
-interface VerificationCodeEmailProps {
+interface PasswordResetEmailProps {
 	code: string;
 	expires: Date;
 	minutesUntilExpiry: number;
 }
 
-export function VerificationCodeEmail({
+export function PasswordResetEmail({
 	code,
 	minutesUntilExpiry,
-}: VerificationCodeEmailProps) {
+}: PasswordResetEmailProps) {
 	return (
 		<Html>
 			<Head />
 			<Body style={main}>
 				<Container style={container}>
 					<Section style={contentSection}>
-						<Heading style={h1}>Verifikasi Alamat Email</Heading>
+						<Heading style={h1}>Reset Password Anda</Heading>
 						<Text style={mainText}>
-							Terima kasih telah memulai pembuatan akun. Kami ingin memastikan
-							itu benar-benar Anda. Harap masukkan kode verifikasi berikut.
+							Hai! Gunakan kode di bawah ini untuk mengatur ulang kata sandi
+							Anda.
 						</Text>
 						<Section style={verificationSection}>
 							<Text style={verifyText}>Kode Verifikasi</Text>
