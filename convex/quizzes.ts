@@ -408,6 +408,7 @@ export const _sendQuizResultEmail = internalAction({
 		const sentAtText = new Date().toLocaleString("id-ID", {
 			dateStyle: "medium",
 			timeStyle: "short",
+			timeZone: "Asia/Jakarta",
 		});
 
 		const { error } = await resend.emails.send({
