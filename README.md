@@ -7,16 +7,16 @@
 
 **Mengenang Pahlawan** adalah platform digital untuk mengenang dan mempelajari kisah pahlawan nasional Indonesia. Aplikasi ini menyajikan biografi, foto, serta informasi resmi terkait penetapan gelar pahlawan.
 
-Selain sebagai ensiklopedia digital, platform ini juga dilengkapi fitur interaktif seperti kuis edukatif, pencarian, dan poin penghargaan.
+Selain berfungsi sebagai ensiklopedia digital, platform ini dilengkapi fitur interaktif seperti kuis edukatif, pencarian, dan sistem poin penghargaan.
 
 ## ✨ Fitur Utama
 
 - **Daftar Pahlawan**: Tampilan daftar pahlawan dengan navigasi slider atau grid avatar.
 - **Detail Pahlawan**: Informasi lengkap meliputi biografi, gelar, pendidikan, warisan, pengakuan resmi, serta foto.
-- **Kuis Interaktif**: Pertanyaan multiple-choice (A, B, C) seputar pahlawan dengan sistem poin.
-- **Riwayat Poin & Badge**: Sistem poin dengan tooltip + modal riwayat untuk melihat pencapaian pengguna.
-- **AI Chat Edukatif**: Chat dengan guardrails, hanya seputar tokoh pahlawan.
-- **Search & Filter**: Fitur pencarian dan filter berdasarkan era.
+- **Kuis Interaktif**: Pertanyaan pilihan ganda (A/B/C) seputar pahlawan dengan sistem poin.
+- **Riwayat Poin & Lencana**: Lihat riwayat dan akumulasi poin melalui tooltip dan modal ringkasan.
+- **Percakapan AI Edukatif**: Percakapan terbatas pada topik pahlawan untuk menjaga relevansi.
+- **Pencarian & Filter**: Pencarian dan penyaringan berdasarkan era.
 
 ## 🛠️ Teknologi
 
@@ -24,35 +24,33 @@ Selain sebagai ensiklopedia digital, platform ini juga dilengkapi fitur interakt
 - **Backend**: Convex (database, auth, query & mutation)
 - **Database**: Convex Tables (users, heroes, points)
 - **Styling**: Tailwind CSS
-- **Deployment**: Cloudflare Workers + Convex (Self-Hosted)
+- **Email**: Resend (+ templat React Email)
+- **LLM**: OpenAI (Responses/Chat Completions)
+- **Deployment**: Cloudflare Workers + Convex (hosting mandiri)
 
 ### Struktur Proyek
 
 ```
 /mengenang-pahlawan/
 ├───convex/
-│   ├───mailry/
-│   │   ├───mailryHttp.ts
-│   │   ├───OTP.ts
-│   │   └───OTPPasswordReset.ts
-│   ├───agent.ts
-│   ├───ai.ts
-│   ├───auth.config.ts
-│   ├───auth.ts
-│   ├───heroes.ts
-│   ├───http.ts
-│   ├───points.ts
-│   ├───quizzes.ts
-│   ├───README.md
-│   ├───schema.ts
-│   ├───tsconfig.json
-│   └───users.ts
+│   ├───agent.ts                 # Rekomendasi & chat edukatif (LLM)
+│   ├───ai.ts                    # Pembuatan kuis berbasis LLM
+│   ├───auth.config.ts           # Konfigurasi Convex Auth
+│   ├───auth.ts                  # Provider GitHub + Password (OTP)
+│   ├───heroes.ts                # Query/mutation data pahlawan
+│   ├───http.ts                  # Router HTTP Convex
+│   ├───llm.ts                   # Klien OpenAI (LLM)
+│   ├───otp.ts                   # OTP via Resend (email)
+│   ├───points.ts                # Ringkasan & riwayat poin
+│   ├───quizzes.ts               # Logika kuis + email hasil
+│   ├───schema.ts                # Definisi skema tabel Convex
+│   └───users.ts                 # Profil & unggah avatar
 ├───src/
 │   ├───components/
 │   │   ├───auth/
-│   │   │   ├───template/
+│   │   │   ├───templates/       # React Email templates
 │   │   │   │   ├───PasswordResetEmail.tsx
-│   │   │   │   └───VerificationCodeEmail.tsx
+│   │   │   │   └───VerificationEmail.tsx
 │   │   │   ├───ui/
 │   │   │   │   ├───ErrorModalAuth.tsx
 │   │   │   │   ├───GitHubButton.tsx
@@ -76,7 +74,9 @@ Selain sebagai ensiklopedia digital, platform ini juga dilengkapi fitur interakt
 │   │   │   └───Home.tsx
 │   │   └───points/
 │   │       ├───PointsBadge.tsx
-│   │       └───PointsHistoryModal.tsx
+│   │       ├───PointsHistoryModal.tsx
+│   │       └───templates/       # Templat email hasil kuis
+│   │           └───QuizResultEmail.tsx
 │   ├───env.d.ts
 │   ├───index.css
 │   └───index.tsx
@@ -84,14 +84,14 @@ Selain sebagai ensiklopedia digital, platform ini juga dilengkapi fitur interakt
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Mulai Cepat
 
-### Prerequisites
+### Prasyarat
 
-- Node.js 18+
-- npm
+- Bun 1.1+ (disarankan)
+- Alternatif: Node.js 18+ dan npm
 
-### Installation
+### Instalasi
 
 1. Clone repository
 
@@ -100,159 +100,128 @@ git clone <repository-url>
 cd mengenang-pahlawan
 ```
 
-2. Install dependencies
+2. Instal dependensi
 
 ```bash
-npm install
+bun install
 ```
 
-3. Setup environment variables
+3. Siapkan variabel lingkungan
 
 ```bash
 cp .env.local.example .env.local
 ```
 
-Isi dengan:
+Isi dengan (sesuaikan):
 
 ```env
 CONVEX_SELF_HOSTED_URL="..."
 CONVEX_SELF_HOSTED_ADMIN_KEY="..."
 PUBLIC_CONVEX_URL="..."
-LUNOS_API_KEY="..."
-LUNOS_API_URL="..."
-LUNOS_LLM_MODEL="..."
-MAILRY_API_KEY="..."
-MAILRY_EMAIL_ID_ACCOUNTS="..."
-MAILRY_EMAIL_ID_NOTIFICATIONS="..."
-UNLI_API_KEY="..."
-UNLI_API_URL="..."
+# Email (Resend)
+MAIL_API_KEY="..."            # Resend API Key
+
+# LLM (OpenAI)
+LLM_API_KEY="..."             # OpenAI API Key
+LLM_MODEL="gpt-4o-mini"       # Contoh model
+LLM_API_URL="https://api.openai.com/v1"  # Opsional (biarkan default jika tidak perlu)
 ```
 
-4. Jalankan development server
+4. Jalankan server pengembangan
 
 ```bash
-npx convex dev && npm run dev
+# Jalankan di dua terminal terpisah:
+# Terminal A (Convex)
+bunx convex dev
+
+# Terminal B (Frontend)
+bun run dev
+```
+
+Menggunakan npm (opsional):
+
+```bash
+npm install
+# Terminal A
+npx convex dev
+# Terminal B
+npm run dev
 ```
 
 ---
 
 ## 📱 Halaman & Routing
 
-| Route                   | Halaman        | Deskripsi                        |
-| ----------------------- | -------------- | -------------------------------- |
-| `/`                     | Home           | Landing page dengan tombol mulai |
-| `/dashboard`            | Dashboard      | Katalog pahlawan dengan tab era  |
-| `/dashboard/hero/:slug` | Hero Detail    | Detail lengkap pahlawan          |
-| `/quiz/:hero`           | Modal Kuis     | Pertanyaan seputar tokoh         |
-| `/points`               | Riwayat Poin   | Modal riwayat poin               |
-| `/auth`                 | Login/Register | Autentikasi GitHub / Email OTP   |
+| Route              | Halaman           | Deskripsi                                              |
+| ------------------ | ----------------- | ------------------------------------------------------ |
+| `/`                | Beranda           | Halaman utama                                          |
+| `/pahlawan`        | Dasbor            | Katalog pahlawan dengan penyaringan berdasarkan era    |
+| `/pahlawan/:slug`  | Detail Pahlawan   | Informasi lengkap mengenai seorang pahlawan            |
+| (modal di halaman) | Kuis / Poin       | Kuis dan riwayat poin ditampilkan melalui antarmuka    |
 
 ---
 
 ## 📊 Fitur Edukatif
 
 - **Era Filtering**: Pahlawan difilter berdasarkan era perjuangan.
-- **Kuis Dinamis**: Pertanyaan otomatis diambil dari slide biografi.
-- **Poin & Badge**: Pengguna dapat poin tiap menjawab kuis.
-- **Tooltip Riwayat**: Hover badge poin untuk lihat ringkasan pencapaian.
+- **Kuis Dinamis**: Pertanyaan otomatis diambil dari ringkasan/sorotan biografi.
+- **Poin & Lencana**: Poin bertambah setiap menjawab kuis.
+- **Ringkasan Riwayat**: Lihat ringkasan pencapaian pada lencana poin.
 - **Modal Riwayat Poin**: Menampilkan detail perolehan poin.
 
 ---
 
-# 🔌 Integrasi Layanan Eksternal
+# 🔌 Integrasi Layanan
 
-Proyek **Mengenang Pahlawan** menggunakan tiga layanan utama untuk meningkatkan fungsionalitas aplikasi:
+Proyek menggunakan dua layanan utama:
 
-1. **📧 Mailry.co** - Layanan email profesional
-2. **🧠 Lunos.tech** - Layanan analisis AI
-3. **🤖 Unli.dev** - Layanan AI pemrosesan teks
-
-Setiap layanan digunakan untuk tujuan yang spesifik dan saling melengkapi.
+1. 📧 Resend — Pengiriman email (OTP, reset password, hasil kuis) dengan React Email.
+2. 🧠 OpenAI — Pembuatan ringkasan, rekomendasi, dan soal kuis (LLM).
 
 ---
 
-## 📧 Mailry.co - Email Service
+## 📧 Resend — Layanan Email
 
-**Tujuan utama:** menangani seluruh proses pengiriman email (verifikasi OTP, konfirmasi login, dan notifikasi akun).
+Digunakan untuk verifikasi email (OTP), pengaturan ulang kata sandi, dan pengiriman hasil kuis.
 
-### ✅ Fitur yang digunakan:
+- Templat: `@react-email/components` di `src/components/**/templates/*`
+- Kunci API: `MAIL_API_KEY` (Resend)
+- Alamat pengirim: pastikan domain `mengenangpahlawan.web.id` terverifikasi di Resend
 
-| Fitur                         | Penjelasan                                                                       |
-| ----------------------------- | -------------------------------------------------------------------------------- |
-| 🔐 **OTP Verification Email** | Mengirim email verifikasi kode OTP saat login/register via email.                |
-| 📩 **Password Reset Email**   | Mengirim kode atau link reset password ke pengguna.                              |
-| 🧱 **HTML Email Template**    | Template email dengan desain yang konsisten (judul, teks utama, highlight kode). |
-| 🔁 **Retry Mechanism**        | Jika pengiriman gagal, sistem otomatis mencoba ulang.                            |
-| 📊 **Delivery Tracking**      | (Opsional) Mencatat status pengiriman email untuk keperluan log/debug.           |
-| 📎 **Attachment Support**     | (Jika diperlukan) mengirim lampiran seperti gambar/berkas.                       |
-
-### ⚙️ Implementasi teknis:
-
-- Endpoint: `https://api.mailry.co/v1/`
-- Autentikasi: API Key
-- Library: `fetch` atau `axios` dengan header `Authorization: Bearer`
-- Template menggunakan komponen `@react-email/components`
+Contoh pemakaian (lihat `convex/otp.ts` dan `convex/quizzes.ts`):
 
 ```ts
-await mailryService.sendVerificationCode(email, code);
-await mailryService.sendPasswordReset(email, code);
+import { Resend as ResendAPI } from "resend";
+
+const resend = new ResendAPI(process.env.MAIL_API_KEY);
+await resend.emails.send({
+	from: "Mengenang Pahlawan <accounts@mengenangpahlawan.web.id>",
+	to: [email],
+	subject: "Verifikasi Email Anda",
+	react: VerificationEmail({ code, minutesUntilExpiry }),
+});
 ```
 
 ---
 
-## 🧠 Lunos.tech - AI Analysis
+## 🧠 OpenAI — LLM
 
-**Tujuan utama:** menganalisis konten biografi pahlawan secara lebih mendalam dan menyarankan metadata tambahan.
+Digunakan untuk ringkasan biografi, rekomendasi pahlawan, chat edukatif, dan pembuatan kuis.
 
-### ✅ Fitur yang digunakan:
+- File klien: `convex/llm.ts`
+- API Key: `LLM_API_KEY`
+- Model: `LLM_MODEL` (contoh: `gpt-4o-mini`)
+- Base URL: `LLM_API_URL` (opsional; gunakan bawaan OpenAI bila tidak diubah)
 
-| Fitur                                 | Penjelasan                                                         |
-| ------------------------------------- | ------------------------------------------------------------------ |
-| 🗂️ **Automatic Categorization**       | Mengkategorikan era/jenis pahlawan berdasarkan konten biografi.    |
-| 📑 **Summary Generation**             | Membuat ringkasan biografi yang lebih ringkas dan padat.           |
-| 🧠 **Legacy & Highlight Extraction**  | Mengekstrak poin-poin penting dari biografi menjadi highlight.     |
-| 📌 **Title & Recognition Suggestion** | Memberi saran judul, pengakuan, atau pengelompokan.                |
-| 🔍 **Quality Assurance**              | Mengevaluasi kelengkapan dan konsistensi data sebelum ditampilkan. |
-
-### ⚙️ Implementasi teknis:
-
-- Endpoint: `https://api.lunos.tech/v1/`
-- Model: GPT-4o
-- Autentikasi: Bearer Token
-- Mendukung batch processing
-- Fallback: analisis lokal jika API gagal
+Contoh sederhana (lihat `convex/ai.ts`, `convex/agent.ts`):
 
 ```ts
-const summary = await lunosService.generateReportSummary(hero.raw);
-const category = await lunosService.categorizeReport(hero.raw);
-const highlights = await lunosService.extractHighlights(hero.raw);
-```
+import { llm } from "./llm";
 
----
-
-## 🤖 Unli.dev - AI Text Processing
-
-**Tujuan utama:** meningkatkan kualitas teks atau menghasilkan pertanyaan kuis dari konten pahlawan.
-
-### ✅ Fitur yang digunakan:
-
-| Fitur                           | Penjelasan                                                                 |
-| ------------------------------- | -------------------------------------------------------------------------- |
-| ✍️ **Text Quality Improvement** | Membersihkan dan memperbaiki teks biografi (grammar, kejelasan, struktur). |
-| 🔤 **Translation (opsional)**   | Menerjemahkan teks ke bahasa Indonesia dari sumber lain (jika impor).      |
-| 💡 **Quiz Question Generation** | Menghasilkan pertanyaan kuis A/B/C berdasarkan ringkasan atau highlight.   |
-| 📋 **Suggestion Generation**    | Menyediakan saran ringkasan, highlight, atau alternatif wording.           |
-
-### ⚙️ Implementasi teknis:
-
-- Endpoint: `https://api.unli.dev/v1/`
-- Model: GPT-3.5-turbo (lebih ringan dan cepat)
-- Autentikasi: API Key
-- Retry & fallback: disediakan jika koneksi error
-
-```ts
-const improved = await unliService.improveTextQuality(biography);
-const quiz = await unliService.generateQuizFromHighlights(highlights);
+const res = await llm.responses.create({
+	model: process.env.LLM_MODEL!,
+	input: "Ringkas biografi pahlawan berikut...",
+} as any);
 ```
 
 ---
@@ -262,32 +231,32 @@ const quiz = await unliService.generateQuizFromHighlights(highlights);
 ### 🔄 Orkestrasi Layanan
 
 - Semua layanan berjalan **asinkron**.
-- Jika salah satu gagal, sistem menggunakan fallback atau degradasi anggun.
-- Retry logic dengan exponential backoff.
-- Logging & monitoring status request.
+- Jika salah satu gagal, sistem menggunakan mekanisme cadangan (fallback).
+- Logika percobaan ulang (retry) dengan backoff eksponensial.
+- Pencatatan dan pemantauan status permintaan.
 
-### 🔐 Environment Variables
+### 🔐 Variabel Lingkungan
 
 ```env
-# Mailry
-MAILRY_API_KEY=your_mailry_key
-MAILRY_API_URL=https://api.mailry.co/v1/
+# Convex (self-hosted)
+CONVEX_SELF_HOSTED_URL=
+CONVEX_SELF_HOSTED_ADMIN_KEY=
+PUBLIC_CONVEX_URL=
 
-# Lunos
-LUNOS_API_KEY=your_lunos_key
-LUNOS_API_URL=https://api.lunos.tech/v1/
+# Resend (email)
+MAIL_API_KEY=
 
-# Unli
-UNLI_API_KEY=your_unli_key
-UNLI_API_URL=https://api.unli.dev/v1/
+# OpenAI (LLM)
+LLM_API_KEY=
+LLM_MODEL=
+LLM_API_URL=https://api.openai.com/v1
 ```
 
 ---
 
 ## 🗂️ Ringkasan Tabel
 
-| Layanan    | Digunakan Untuk                                             | Model/Tech   |
-| ---------- | ----------------------------------------------------------- | ------------ |
-| **Mailry** | OTP login, reset password, konfirmasi akun, hasil kuis      | Email Engine |
-| **Lunos**  | Ringkasan biografi, klasifikasi pahlawan, highlight warisan | GPT-5        |
-| **Unli**   | Perbaikan teks, kuis otomatis, saran bahasa                 | GPT-4        |
+| Layanan | Digunakan Untuk                                       | Model/Tech        |
+| ------- | ----------------------------------------------------- | ----------------- |
+| Resend  | OTP, reset password, hasil kuis                       | React Email + API |
+| OpenAI  | Ringkasan, rekomendasi, chat edukatif, pembuatan kuis | GPT-4o family     |
