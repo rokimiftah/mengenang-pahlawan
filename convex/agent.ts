@@ -26,6 +26,17 @@ function safeJson<T>(s: string, fallback: T): T {
 	}
 }
 
+function isContextRelevantQuestion(input: string): boolean {
+	const q = (input || "").toLowerCase();
+	const pronoun = /\b(kamu|anda|kau|engkau|dirimu)\b/;
+	const rel =
+		/\b(istri|suami|anak|ayah|ibu|orang\s+tua|keluarga|nama|umur|lahir|kelahiran|wafat|meninggal|dimakamkan|makam|asal|asal[-\s]?usul|pendidikan|sekolah|gelar|penghargaan|organisasi|didirikan)\b/;
+	const possessive =
+		/\b(istrimu|suamimu|anakmu|ayahmu|ibumu|namamu|umurmu|kelahiranmu|lahirmu|wafatmu|makammu)\b/;
+
+	return pronoun.test(q) || possessive.test(q) || rel.test(q);
+}
+
 export const recommendHeroes = action({
 	args: {
 		currentSlug: v.string(),
@@ -141,14 +152,30 @@ export const chatAsHero = action({
 
 			Kriteria relevan:
 			- tentang kehidupan, perjuangan, era, karya, pengaruh, atau fakta terkait ${hero.name}.
+			- jika pengguna memakai kata ganti orang ("kamu/anda") dalam konteks chat, anggap subjeknya adalah ${hero.name}.
+			- pertanyaan biografis generik seperti istri/suami/anak, tempat & tanggal lahir/wafat, pendidikan, gelar/penghargaan, organisasi yang didirikan tetap RELEVAN walau tidak menyebut nama ${hero.name}.
 			- banding/relasi dengan tokoh/sejarah yang masih terkait konteks ${hero.name} juga relevan.
 			Tidak relevan: matematika umum, coding, topik pop culture modern, tokoh lain tanpa kaitan, hal di luar sejarah ${hero.name}.
+
+			Contoh relevan:
+			- "siapa istri kamu?"
+			- "kapan kamu lahir?" / "di mana dimakamkan?"
+			- "apa organisasi yang kamu dirikan?"
+			- "apa dampaknya pada pendidikan?"
+
+			Contoh tidak relevan:
+			- "hitung 2+2", "cara bikin website", "lagu pop terbaru".
 		`.trim();
 
 		const judgeOut = await generateText(judgePrompt, 0);
 		const judge = safeJson<{ relevant?: boolean; reason?: string }>(judgeOut, {
 			relevant: true,
 		});
+
+		if (!judge.relevant && isContextRelevantQuestion(q)) {
+			judge.relevant = true;
+		}
+
 		if (!judge.relevant) {
 			return {
 				reply:
