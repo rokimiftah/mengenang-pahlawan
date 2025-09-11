@@ -5,7 +5,7 @@ import { v } from "convex/values";
 
 import { api } from "./_generated/api";
 import { action } from "./_generated/server";
-import { generateText } from "./llm";
+import { llm } from "./llm";
 
 type HeroLite = {
 	slug: string;
@@ -31,8 +31,7 @@ function isContextRelevantQuestion(input: string): boolean {
 	const pronoun = /\b(kamu|anda|kau|engkau|dirimu)\b/;
 	const rel =
 		/\b(istri|suami|anak|ayah|ibu|orang\s+tua|keluarga|nama|umur|lahir|kelahiran|wafat|meninggal|dimakamkan|makam|asal|asal[-\s]?usul|pendidikan|sekolah|gelar|penghargaan|organisasi|didirikan)\b/;
-	const possessive =
-		/\b(istrimu|suamimu|anakmu|ayahmu|ibumu|namamu|umurmu|kelahiranmu|lahirmu|wafatmu|makammu)\b/;
+	const possessive = /\b(istrimu|suamimu|anakmu|ayahmu|ibumu|namamu|umurmu|kelahiranmu|lahirmu|wafatmu|makammu)\b/;
 
 	return pronoun.test(q) || possessive.test(q) || rel.test(q);
 }
@@ -60,10 +59,7 @@ export const recommendHeroes = action({
 		if (!candidates.length) return { recs: [] as HeroLite[] };
 
 		const lines = candidates
-			.map(
-				(h) =>
-					`${h.slug} | ${h.name} | ${h.era ?? ""} | ${(h.titles ?? []).slice(0, 2).join(", ")}`,
-			)
+			.map((h) => `${h.slug} | ${h.name} | ${h.era ?? ""} | ${(h.titles ?? []).slice(0, 2).join(", ")}`)
 			.join("\n");
 
 		const prompt = `
@@ -79,7 +75,7 @@ export const recommendHeroes = action({
 			{"slugs":["slug1","slug2","slug3"]}
 		`.trim();
 
-		const out = await generateText(prompt, 0.2);
+		const out = await llm(prompt, 0.2);
 
 		let picks: string[] = [];
 		try {
@@ -90,8 +86,7 @@ export const recommendHeroes = action({
 			if (m) {
 				try {
 					const j = JSON.parse(m[0]);
-					if (Array.isArray(j?.slugs))
-						picks = j.slugs.map((s: any) => String(s));
+					if (Array.isArray(j?.slugs)) picks = j.slugs.map((s: any) => String(s));
 				} catch {
 					// ignore
 				}
@@ -113,14 +108,9 @@ export const chatAsHero = action({
 	args: {
 		slug: v.string(),
 		message: v.string(),
-		history: v.optional(
-			v.array(v.object({ role: v.string(), content: v.string() })),
-		),
+		history: v.optional(v.array(v.object({ role: v.string(), content: v.string() }))),
 	},
-	handler: async (
-		ctx,
-		{ slug, message, history = [] },
-	): Promise<{ reply: string }> => {
+	handler: async (ctx, { slug, message, history = [] }): Promise<{ reply: string }> => {
 		const hero = (await ctx.runQuery(api.heroes.getBySlug, {
 			slug,
 		})) as any;
@@ -167,7 +157,7 @@ export const chatAsHero = action({
 			- "hitung 2+2", "cara bikin website", "lagu pop terbaru".
 		`.trim();
 
-		const judgeOut = await generateText(judgePrompt, 0);
+		const judgeOut = await llm(judgePrompt, 0);
 		const judge = safeJson<{ relevant?: boolean; reason?: string }>(judgeOut, {
 			relevant: true,
 		});
@@ -212,7 +202,7 @@ export const chatAsHero = action({
 			Batas 4-6 kalimat. Bahasa Indonesia sopan & mudah dipahami.
 		`.trim();
 
-		const reply = (await generateText(prompt, 0.7)).trim();
+		const reply = (await llm(prompt, 0.7)).trim();
 		return {
 			reply:
 				reply ||

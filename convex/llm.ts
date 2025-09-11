@@ -3,37 +3,26 @@
 
 import OpenAI from "openai";
 
-export const llm = new OpenAI({
-	apiKey: process.env.LLM_API_KEY,
-	baseURL: process.env.LLM_API_URL,
-});
+export async function llm(prompt: string, temperature: number): Promise<string> {
+	const openai = new OpenAI({
+		apiKey: process.env.LLM_API_KEY,
+		baseURL: process.env.LLM_API_URL,
+	});
 
-export async function generateText(
-	prompt: string,
-	temperature = 0.2,
-): Promise<string> {
 	try {
-		const res = await llm.responses.create({
-			model: process.env.LLM_MODEL,
-			input: prompt,
+		const completion = await openai.chat.completions.create({
+			model: process.env.LLM_MODEL as string,
+			messages: [{ role: "user", content: prompt }],
 			temperature,
-		} as any);
-
-		return (
-			(res as any).output_text ??
-			(res as any).output?.[0]?.content?.[0]?.text ??
-			(res as any).choices?.[0]?.message?.content ??
-			""
-		);
-	} catch (e: any) {
-		if (e?.status === 400 || e?.status === 404) {
-			const chat = await llm.chat.completions.create({
-				model: process.env.LLM_MODEL as string,
-				messages: [{ role: "user", content: prompt }],
-				temperature,
-			});
-			return chat.choices?.[0]?.message?.content ?? "";
+		});
+		return completion.choices?.[0]?.message?.content ?? "";
+	} catch (error) {
+		if (error instanceof OpenAI.APIError) {
+			console.error(`OpenAI API Error: Status ${error.status}, Message: ${error.message}`);
+			throw new Error(`Failed to generate completion due to API error: ${error.message}`);
+		} else {
+			console.error("An unexpected error occurred:", error);
+			throw new Error("An unexpected error occurred while generating completion.");
 		}
-		throw e;
 	}
 }
