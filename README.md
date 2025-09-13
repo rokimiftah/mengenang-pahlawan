@@ -141,12 +141,26 @@ npm run dev
 
 ## 📱 Halaman & Routing
 
-| Route              | Halaman         | Deskripsi                                           |
-| ------------------ | --------------- | --------------------------------------------------- |
-| `/`                | Beranda         | Halaman utama                                       |
-| `/pahlawan`        | Dasbor          | Katalog pahlawan dengan penyaringan berdasarkan era |
-| `/pahlawan/:slug`  | Detail Pahlawan | Informasi lengkap mengenai seorang pahlawan         |
-| (modal di halaman) | Kuis / Poin     | Kuis dan riwayat poin ditampilkan melalui antarmuka |
+| Route                | Halaman              | Deskripsi                                                                 |
+| -------------------- | -------------------- | ------------------------------------------------------------------------- |
+| `/`                  | Beranda              | Halaman utama                                                             |
+| `/login`             | Login                | Form masuk; jika sudah login → redirect ke `/pahlawan`                    |
+| `/register`          | Daftar               | Form pendaftaran; jika sudah login → redirect ke `/pahlawan`              |
+| `/forgot-password`   | Lupa Kata Sandi      | Kirim kode reset; jika sudah login → redirect ke `/pahlawan`              |
+| `/verify-email`      | Verifikasi Email     | Verifikasi email via kode; baca `?email=`                                  |
+| `/reset-password`    | Reset Kata Sandi     | Reset kata sandi via kode; baca `?email=`                                  |
+| `/pahlawan`          | Dasbor               | Katalog pahlawan (protected; jika belum login → redirect ke `/login`)     |
+| `/pahlawan/:slug`    | Detail Pahlawan      | Info lengkap pahlawan (protected; jika belum login → redirect ke `/login`) |
+| (modal di halaman)   | Kuis / Poin          | Kuis dan riwayat poin ditampilkan melalui antarmuka                        |
+
+Catatan routing & guard:
+
+- Rute auth (login/register/forgot/verify/reset) bersifat guest-only. Jika pengguna sudah login, diarahkan ke `/pahlawan`.
+- Rute dashboard (daftar & detail pahlawan) bersifat protected. Jika belum login, diarahkan ke `/login`.
+- Alur auth otomatis memindahkan rute sesuai aksi:
+  - Sign up atau sign in (email belum terverifikasi) → `/verify-email?email=...`
+  - Forgot/Reset → `/reset-password?email=...`
+  - Verifikasi/reset sukses → `/login`
 
 ---
 
