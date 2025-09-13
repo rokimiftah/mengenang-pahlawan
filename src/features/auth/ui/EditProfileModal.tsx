@@ -30,6 +30,19 @@ export function EditProfileModal({ opened, onClose }: { opened: boolean; onClose
 
 	const previewUrl = useMemo(() => (avatarFile ? URL.createObjectURL(avatarFile) : null), [avatarFile]);
 
+	const initials = useMemo(() => {
+		const src = (user?.name || user?.email || "?").trim();
+		const parts = src.includes("@")
+			? src
+					.split("@")[0]
+					.split(/[.\s_+-]+/)
+					.filter(Boolean)
+			: src.split(/\s+/).filter(Boolean);
+		const a = parts[0]?.[0] ?? "?";
+		const b = parts[1]?.[0] ?? "";
+		return (a + b).toUpperCase();
+	}, [user?.name, user?.email]);
+
 	useEffect(() => {
 		return () => {
 			if (previewUrl) {
@@ -129,7 +142,7 @@ export function EditProfileModal({ opened, onClose }: { opened: boolean; onClose
 									className="flex h-full w-full items-center justify-center bg-gray-100 text-2xl font-medium text-gray-700"
 									delayMs={600}
 								>
-									{user?.name?.slice(0, 2).toUpperCase() || "AV"}
+									{initials}
 								</AvatarPrimitive.Fallback>
 							</AvatarPrimitive.Root>
 							<input

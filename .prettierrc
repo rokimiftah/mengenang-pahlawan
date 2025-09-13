@@ -1,27 +1,25 @@
 {
-	"astroAllowShorthand": true,
-
 	"importOrder": [
 		"<TYPES>",
-		"<TYPES>^(node:)",
-		"<TYPES>^[.]",
 		"",
 		"<BUILTIN_MODULES>",
 		"",
 		"^react(-dom)?(/.*)?$",
 		"",
-		"^(?!(?:node:)|[./]|@(?:app|entities|features|pages|shared|components|convex/_generated)/).+",
+		"^(?!(?:node:)|[./]|@(?:app|entities|features|pages|shared|convex/_generated)/).+",
 		"",
 		"^@convex/_generated(/.*)?$",
 		"",
 		"^@(?:app|entities|features|pages|shared)(/.*)?$",
 		"",
-		"^(?!.*[.]css$)[./].*$",
+		"^(?!.*\\.(css|scss|sass|less)$)[./].*$",
 		"",
-		".css$"
+		"\\.(css|scss|sass|less)$"
 	],
 
 	"importOrderParserPlugins": ["typescript", "jsx", "decorators"],
+
+	"importOrderSafeSideEffects": ["^.+\\.(css|scss|sass|less)$"],
 
 	"importOrderTypeScriptVersion": "5.0.0",
 

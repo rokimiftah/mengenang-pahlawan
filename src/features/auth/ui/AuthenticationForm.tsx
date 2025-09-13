@@ -1,6 +1,7 @@
 // src/features/auth/ui/AuthenticationForm.tsx
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useAuthActions } from "@convex-dev/auth/react";
 import { Anchor, Button, Center, Divider, Group, Paper, PasswordInput, Text, TextInput } from "@mantine/core";
@@ -9,6 +10,7 @@ import { useToggle } from "@mantine/hooks";
 import { ConvexReactClient } from "convex/react";
 import { ConvexError } from "convex/values";
 import isEmail from "validator/lib/isEmail";
+import { useLocation } from "wouter";
 
 import { api } from "@convex/_generated/api";
 
@@ -28,7 +30,14 @@ interface AuthFormValues {
 	newPassword: string;
 }
 
-export function AuthenticationForm() {
+export function AuthenticationForm({
+	initialType,
+	initialEmail,
+}: {
+	initialType?: "signIn" | "signUp" | "verify" | "forgot" | "reset";
+	initialEmail?: string;
+}) {
+	const [, navigate] = useLocation();
 	const { signIn } = useAuthActions();
 	const [type, toggle] = useToggle<"signIn" | "signUp" | "verify" | "forgot" | "reset">([
 		"signIn",
@@ -81,6 +90,19 @@ export function AuthenticationForm() {
 		},
 	});
 
+	// Apply initial route intent (optional) once on mount
+	const initRef = useRef(false);
+	useEffect(() => {
+		if (initRef.current) return;
+		initRef.current = true;
+		if (initialType) toggle(initialType as any);
+		if (initialEmail) {
+			setEmail(initialEmail);
+			// keep form value in sync for backend flows that read from formData
+			form.setFieldValue("email", initialEmail);
+		}
+	}, [initialType, initialEmail, toggle, form]);
+
 	const handleGitHubLogin = useCallback(async () => {
 		setIsLoading(true);
 		setError(null);
@@ -101,7 +123,8 @@ export function AuthenticationForm() {
 			setIsLoading(true);
 			setError(null);
 			const formData = new FormData();
-			const normalizedEmail = values.email.trim().toLowerCase();
+			const effectiveEmail = (values.email?.trim() || email || "").toLowerCase();
+			const normalizedEmail = effectiveEmail;
 			formData.set("email", normalizedEmail);
 
 			try {
@@ -112,7 +135,7 @@ export function AuthenticationForm() {
 
 					if (type === "signIn" && !userExists) {
 						setIsLoading(false);
-						setError("Email atau kata sandi tidak valid");
+						setError("Email atau kata sandi salah");
 						return;
 					}
 
@@ -175,25 +198,21 @@ export function AuthenticationForm() {
 						email: normalizedEmail,
 					});
 					if (!isVerified) {
-						setEmail(normalizedEmail);
-						toggle("verify");
-						setError("Email belum terverifikasi. Silakan verifikasi email Anda");
+						navigate(`/verify-email?email=${encodeURIComponent(normalizedEmail)}`);
 						setIsLoading(false);
 						return;
 					}
 				} else if (type === "signUp" && !result.signingIn) {
-					setEmail(normalizedEmail);
-					toggle("verify");
+					navigate(`/verify-email?email=${encodeURIComponent(normalizedEmail)}`);
 				} else if (type === "forgot" && !result.signingIn) {
-					setEmail(normalizedEmail);
-					toggle("reset");
+					navigate(`/reset-password?email=${encodeURIComponent(normalizedEmail)}`);
 				} else if (type === "verify" && !result.signingIn) {
 					try {
 						await convex.mutation(api.users.verifyEmail, {
 							email: normalizedEmail,
 							code: values.code,
 						});
-						toggle("signIn");
+						navigate("/login");
 					} catch (verifyError: unknown) {
 						const errorMessage =
 							verifyError instanceof ConvexError
@@ -204,7 +223,7 @@ export function AuthenticationForm() {
 						return;
 					}
 				} else if (type === "reset" && !result.signingIn) {
-					toggle("signIn");
+					navigate("/login");
 				}
 			} catch (error: unknown) {
 				let errorMessage: string;
@@ -214,7 +233,7 @@ export function AuthenticationForm() {
 						type === "signIn" &&
 						(errorData.message === "Invalid credentials" || errorData.message.includes("Invalid password"))
 					) {
-						errorMessage = "Email atau kata sandi tidak valid";
+						errorMessage = "Email atau kata sandi salah";
 					} else {
 						errorMessage =
 							errorData.message ||
@@ -227,7 +246,7 @@ export function AuthenticationForm() {
 				} else {
 					errorMessage =
 						type === "signIn"
-							? "Email atau kata sandi tidak valid"
+							? "Email atau kata sandi salah"
 							: type === "verify"
 								? "Kode verifikasi tidak valid atau sudah kedaluwarsa"
 								: type === "reset"
@@ -239,17 +258,7 @@ export function AuthenticationForm() {
 				setIsLoading(false);
 			}
 		},
-		[signIn, type, toggle],
-	);
-
-	const toggleType = useCallback(
-		(newType: "signIn" | "signUp" | "forgot") => {
-			toggle(newType);
-			form.reset();
-			setError(null);
-			setEmail(null);
-		},
-		[form, toggle],
+		[signIn, type, navigate, email],
 	);
 
 	return (
@@ -325,12 +334,12 @@ export function AuthenticationForm() {
 										Kata Sandi <span className="text-red-500">*</span>
 									</Text>
 									<Anchor
-										href="#"
+										href="/forgot-password"
 										fz="xs"
 										fw={500}
 										onClick={(e) => {
 											e.preventDefault();
-											toggleType("forgot");
+											navigate("/forgot-password");
 										}}
 										underline="hover"
 									>
@@ -408,7 +417,10 @@ export function AuthenticationForm() {
 								size="xs"
 								underline="hover"
 								c="#a3a3a3"
-								onClick={() => toggleType(type === "signIn" ? "signUp" : "signIn")}
+								onClick={() => {
+									if (type === "signIn") navigate("/register");
+									else navigate("/login");
+								}}
 								className="text-center sm:text-left"
 							>
 								{type === "signIn"

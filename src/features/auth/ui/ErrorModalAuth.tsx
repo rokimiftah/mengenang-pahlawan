@@ -77,7 +77,7 @@ export const ErrorModalAuth = ({ error, onClose }: ErrorModalProps) => {
 					message: {
 						marginTop: 6,
 						marginBottom: 6,
-						fontSize: 14,
+						fontSize: 15,
 						lineHeight: 1.45,
 						wordBreak: "break-word",
 					},
