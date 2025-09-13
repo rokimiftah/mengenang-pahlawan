@@ -46,39 +46,28 @@ Selain berfungsi sebagai ensiklopedia digital, platform ini dilengkapi fitur int
 │   ├───schema.ts                # Definisi skema tabel Convex
 │   └───users.ts                 # Profil & unggah avatar
 ├───src/
-│   ├───components/
+│   ├───app/
+│   │   ├───providers/            # AppProviders: Mantine + ConvexAuth
+│   │   ├───router/               # Definisi routes (wouter)
+│   │   └───App.tsx
+│   ├───pages/
+│   │   ├───HomePage/             # Landing page
+│   │   ├───DashboardPage/        # Layout dashboard + list pahlawan
+│   │   └───HeroDetailPage/       # Layout dashboard + detail pahlawan
+│   ├───features/
 │   │   ├───auth/
-│   │   │   ├───templates/       # React Email templates
-│   │   │   │   ├───PasswordResetEmail.tsx
-│   │   │   │   └───VerificationEmail.tsx
-│   │   │   ├───ui/
-│   │   │   │   ├───ErrorModalAuth.tsx
-│   │   │   │   ├───GitHubButton.tsx
-│   │   │   │   ├───PasswordStrength.tsx
-│   │   │   │   ├───SignOut.tsx
-│   │   │   │   ├───UserInfo.tsx
-│   │   │   │   └───UserMenu.tsx
-│   │   │   └───AuthenticationForm.tsx
-│   │   ├───dashboard/
-│   │   │   ├───Dashboard.css
-│   │   │   └───Dashboard.tsx
-│   │   ├───filters/
-│   │   │   ├───FilterContext.tsx
-│   │   │   └───SearchFilterLauncher.tsx
+│   │   │   ├───ui/               # AuthenticationForm, UserMenu, dll
+│   │   │   └───templates/        # VerificationEmail, PasswordResetEmail
 │   │   ├───heroes/
-│   │   │   ├───HeroDetail.tsx
-│   │   │   ├───HeroGrid.tsx
-│   │   │   └───HeroShelf.tsx
-│   │   ├───home/
-│   │   │   ├───Home.css
-│   │   │   └───Home.tsx
+│   │   │   ├───ui/               # HeroGrid, HeroShelf, HeroDetail, HeroFilters
+│   │   │   ├───api/              # Adapter Convex (useHeroesList, dsb)
+│   │   │   └───model/            # FilterContext
 │   │   └───points/
-│   │       ├───PointsBadge.tsx
-│   │       ├───PointsHistoryModal.tsx
-│   │       └───templates/       # Templat email hasil kuis
-│   │           └───QuizResultEmail.tsx
+│   │       ├───ui/               # PointsBadge, PointsHistoryModal
+│   │       └───templates/        # QuizResultEmail (email)
+│   ├───shared/
+│   │   └───styles/tailwind.css   # Tailwind global + animasi
 │   ├───env.d.ts
-│   ├───index.css
 │   └───index.tsx
 ```
 
@@ -152,12 +141,12 @@ npm run dev
 
 ## 📱 Halaman & Routing
 
-| Route              | Halaman           | Deskripsi                                              |
-| ------------------ | ----------------- | ------------------------------------------------------ |
-| `/`                | Beranda           | Halaman utama                                          |
-| `/pahlawan`        | Dasbor            | Katalog pahlawan dengan penyaringan berdasarkan era    |
-| `/pahlawan/:slug`  | Detail Pahlawan   | Informasi lengkap mengenai seorang pahlawan            |
-| (modal di halaman) | Kuis / Poin       | Kuis dan riwayat poin ditampilkan melalui antarmuka    |
+| Route              | Halaman         | Deskripsi                                           |
+| ------------------ | --------------- | --------------------------------------------------- |
+| `/`                | Beranda         | Halaman utama                                       |
+| `/pahlawan`        | Dasbor          | Katalog pahlawan dengan penyaringan berdasarkan era |
+| `/pahlawan/:slug`  | Detail Pahlawan | Informasi lengkap mengenai seorang pahlawan         |
+| (modal di halaman) | Kuis / Poin     | Kuis dan riwayat poin ditampilkan melalui antarmuka |
 
 ---
 
@@ -184,7 +173,7 @@ Proyek menggunakan dua layanan utama:
 
 Digunakan untuk verifikasi email (OTP), pengaturan ulang kata sandi, dan pengiriman hasil kuis.
 
-- Templat: `@react-email/components` di `src/components/**/templates/*`
+- Templat: `@react-email/components` di `src/features/*/templates/*`
 - Kunci API: `MAIL_API_KEY` (Resend)
 - Alamat pengirim: pastikan domain `mengenangpahlawan.web.id` terverifikasi di Resend
 

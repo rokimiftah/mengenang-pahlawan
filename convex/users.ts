@@ -31,10 +31,7 @@ export const getUserVerificationStatus = query({
 			.query("users")
 			.withIndex("email", (q) => q.eq("email", args.email))
 			.first();
-		return (
-			user?.emailVerificationTime !== undefined &&
-			user?.emailVerificationTime !== null
-		);
+		return user?.emailVerificationTime !== undefined && user?.emailVerificationTime !== null;
 	},
 });
 

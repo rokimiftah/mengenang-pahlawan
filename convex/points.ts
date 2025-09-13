@@ -1,8 +1,7 @@
 // convex/points.ts
 
-import { v } from "convex/values";
-
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { v } from "convex/values";
 
 import { query } from "./_generated/server";
 
@@ -48,9 +47,7 @@ export const getAwards = query({
 			.withIndex("by_user_time", (q) => q.eq("userId", userId))
 			.collect();
 
-		const recent = all
-			.sort((a, b) => b.createdAt - a.createdAt)
-			.slice(0, Math.max(1, Math.min(limit ?? 20, 100)));
+		const recent = all.sort((a, b) => b.createdAt - a.createdAt).slice(0, Math.max(1, Math.min(limit ?? 20, 100)));
 
 		const bySlug = new Map<string, string>();
 		for (const a of recent) {

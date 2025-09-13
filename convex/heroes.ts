@@ -22,18 +22,14 @@ function toDDMMYYYY(input?: string): string | undefined {
 	return input;
 }
 
-const s = (x: any): string | undefined =>
-	typeof x === "string" && x.trim() ? x.trim() : undefined;
+const s = (x: any): string | undefined => (typeof x === "string" && x.trim() ? x.trim() : undefined);
 
-const arrS = (xs: any): string[] | undefined =>
-	Array.isArray(xs) ? (xs.map(s).filter(Boolean) as string[]) : undefined;
+const arrS = (xs: any): string[] | undefined => (Array.isArray(xs) ? (xs.map(s).filter(Boolean) as string[]) : undefined);
 
 const bd = (o: any): { date?: string; place?: string } | undefined => {
 	const date = toDDMMYYYY(s(o?.date));
 	const place = s(o?.place);
-	return date || place
-		? { ...(date ? { date } : {}), ...(place ? { place } : {}) }
-		: undefined;
+	return date || place ? { ...(date ? { date } : {}), ...(place ? { place } : {}) } : undefined;
 };
 
 const recObj = (o: any): { basis: string; date?: string } | undefined => {
@@ -112,9 +108,7 @@ export const importFromJson = mutation({
 
 			const recognition = recObj(raw?.recognition);
 			const sources = recognition
-				? [
-						`${recognition.basis}${recognition.date ? ` (${recognition.date})` : ""}`,
-					]
+				? [`${recognition.basis}${recognition.date ? ` (${recognition.date})` : ""}`]
 				: ["Sumber internal JSON"];
 
 			const existing = await ctx.db
@@ -181,11 +175,7 @@ export const list = query({
 			if (args.era && h.era !== args.era) return false;
 			if (!tokens.length) return true;
 
-			const combined = norm(
-				[h.name, ...(Array.isArray(h?.raw?.aliases) ? h.raw.aliases : [])].join(
-					" ",
-				),
-			);
+			const combined = norm([h.name, ...(Array.isArray(h?.raw?.aliases) ? h.raw.aliases : [])].join(" "));
 
 			return tokens.every((t) => combined.includes(t));
 		});

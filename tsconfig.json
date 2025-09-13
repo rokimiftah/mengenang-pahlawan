@@ -9,11 +9,14 @@
 		/* Modules */
 		"module": "esnext",
 		"moduleResolution": "bundler",
-		"baseUrl": ".",
+		"baseUrl": "src",
 		"paths": {
-			"@components/dashboard": ["src/components/dashboard/Dashboard"],
-			"@components/home": ["src/components/home/Home"],
-			"@convex/*": ["convex/*"]
+			"@app/*": ["app/*"],
+			"@pages/*": ["pages/*"],
+			"@features/*": ["features/*"],
+			"@entities/*": ["entities/*"],
+			"@shared/*": ["shared/*"],
+			"@convex/*": ["../convex/*"]
 		},
 		"allowImportingTsExtensions": true,
 		"resolveJsonModule": true,

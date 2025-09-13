@@ -2,12 +2,11 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: <> */
 /** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { Resend as ResendAPI } from "resend";
 
-import { getAuthUserId } from "@convex-dev/auth/server";
-
-import { QuizResultEmail } from "../src/components/points/templates/QuizResultEmail";
+import QuizResultEmail from "../src/features/points/templates/QuizResultEmail";
 import { internal } from "./_generated/api";
 import { internalAction, mutation } from "./_generated/server";
 
@@ -20,13 +19,7 @@ type Question = {
 	explanation?: string;
 };
 
-const ERAS = [
-	"Perang Kolonial",
-	"Pergerakan Nasional",
-	"Pendudukan Jepang",
-	"Revolusi & Orde Lama",
-	"Sesudah 1966",
-] as const;
+const ERAS = ["Perang Kolonial", "Pergerakan Nasional", "Pendudukan Jepang", "Revolusi & Orde Lama", "Sesudah 1966"] as const;
 
 const fmtDDMMYYYY = (input?: string | null): string | undefined => {
 	if (!input) return undefined;
@@ -75,26 +68,16 @@ async function decoyBank(ctx: any, exceptSlug: string) {
 	const all = await ctx.db.query("heroes").collect();
 	const others = all.filter((h: any) => h.slug !== exceptSlug);
 	return {
-		birthPlaces: others
-			.map((h: any) => h?.birth?.place)
-			.filter(Boolean) as string[],
+		birthPlaces: others.map((h: any) => h?.birth?.place).filter(Boolean) as string[],
 		eras: ERAS.slice(),
-		recognitions: others
-			.map((h: any) => h?.recognition?.basis)
-			.filter(Boolean) as string[],
+		recognitions: others.map((h: any) => h?.recognition?.basis).filter(Boolean) as string[],
 		highlights: others
-			.flatMap(
-				(h: any) =>
-					h?.raw?.biography?.highlights ?? h?.biography?.highlights ?? [],
-			)
+			.flatMap((h: any) => h?.raw?.biography?.highlights ?? h?.biography?.highlights ?? [])
 			.filter(Boolean) as string[],
 	};
 }
 
-function buildQuestions(
-	hero: any,
-	bank: Awaited<ReturnType<typeof decoyBank>>,
-): Question[] {
+function buildQuestions(hero: any, bank: Awaited<ReturnType<typeof decoyBank>>): Question[] {
 	const out: Question[] = [];
 	const name = hero.name as string;
 
@@ -102,28 +85,19 @@ function buildQuestions(
 	if (by) {
 		const d1 = by + 1;
 		const d2 = by - 2;
-		const options = shuffle([
-			opt(String(by)),
-			opt(String(d1)),
-			opt(String(d2)),
-		]);
+		const options = shuffle([opt(String(by)), opt(String(d1)), opt(String(d2))]);
 		out.push({
 			id: cryptoRandomId(),
 			prompt: `Tahun berapa ${name} lahir?`,
 			options,
 			answerId: options.find((o) => o.text === String(by))!.id,
-			explanation: hero?.birth?.date
-				? `Tanggal lahir: ${fmtDDMMYYYY(hero.birth.date)}`
-				: undefined,
+			explanation: hero?.birth?.date ? `Tanggal lahir: ${fmtDDMMYYYY(hero.birth.date)}` : undefined,
 		});
 	}
 
 	const bp = s(hero?.birth?.place);
 	if (bp) {
-		const decoys = shuffle(bank.birthPlaces.filter((p) => p !== bp)).slice(
-			0,
-			2,
-		);
+		const decoys = shuffle(bank.birthPlaces.filter((p) => p !== bp)).slice(0, 2);
 		const options = shuffle([opt(bp), ...decoys.map(opt)]);
 		if (options.length === 3) {
 			out.push({
@@ -149,10 +123,7 @@ function buildQuestions(
 
 	const basis = s(hero?.recognition?.basis);
 	if (basis) {
-		const decoys = shuffle(bank.recognitions.filter((b) => b !== basis)).slice(
-			0,
-			2,
-		);
+		const decoys = shuffle(bank.recognitions.filter((b) => b !== basis)).slice(0, 2);
 		const options = shuffle([opt(basis), ...decoys.map(opt)]);
 		if (options.length === 3) {
 			out.push({
@@ -160,23 +131,16 @@ function buildQuestions(
 				prompt: `Dasar penetapan gelar pahlawan ${name}?`,
 				options,
 				answerId: options.find((o) => o.text === basis)!.id,
-				explanation: hero?.recognition?.date
-					? `Tanggal Keppres: ${fmtDDMMYYYY(hero.recognition.date)}`
-					: undefined,
+				explanation: hero?.recognition?.date ? `Tanggal Keppres: ${fmtDDMMYYYY(hero.recognition.date)}` : undefined,
 			});
 		}
 	}
 
-	const hl = (hero?.biography?.highlights ??
-		hero?.raw?.biography?.highlights ??
-		[]) as string[];
+	const hl = (hero?.biography?.highlights ?? hero?.raw?.biography?.highlights ?? []) as string[];
 	if (hl.length > 0) {
 		const truth = s(hl[0]);
 		if (truth) {
-			const decoys = shuffle(bank.highlights.filter((h) => h !== truth)).slice(
-				0,
-				2,
-			);
+			const decoys = shuffle(bank.highlights.filter((h) => h !== truth)).slice(0, 2);
 			const options = shuffle([opt(truth), ...decoys.map(opt)]);
 			out.push({
 				id: cryptoRandomId(),
@@ -294,9 +258,7 @@ export const recordAttempt = mutation({
 				});
 			}
 
-			const nextSlugs = daily!.heroSlugs.includes(slug)
-				? daily!.heroSlugs
-				: [...daily!.heroSlugs, slug];
+			const nextSlugs = daily!.heroSlugs.includes(slug) ? daily!.heroSlugs : [...daily!.heroSlugs, slug];
 
 			await ctx.db.patch(daily!._id, {
 				scoredCount: daily!.scoredCount + 1,
@@ -306,10 +268,7 @@ export const recordAttempt = mutation({
 		}
 
 		const scoredNow = !alreadyHeroToday && !reachedDailyCap ? 1 : 0;
-		const dailyRemaining = Math.max(
-			0,
-			DAILY_CAP - (daily!.scoredCount + scoredNow),
-		);
+		const dailyRemaining = Math.max(0, DAILY_CAP - (daily!.scoredCount + scoredNow));
 
 		await ctx.db.insert("quizAwards", {
 			userId,
@@ -370,16 +329,7 @@ export const _sendQuizResultEmail = internalAction({
 		breakdown: v.any(),
 	},
 	handler: async (_ctx, args) => {
-		const {
-			email,
-			userName,
-			heroName,
-			total,
-			correct,
-			awarded,
-			practice,
-			breakdown,
-		} = args;
+		const { email, userName, heroName, total, correct, awarded, practice, breakdown } = args;
 
 		const subject = `Hasil Kuis Mengenang Pahlawan: ${heroName}`;
 

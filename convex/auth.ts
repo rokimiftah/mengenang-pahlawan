@@ -3,12 +3,11 @@
 
 import type { MutationCtx } from "./_generated/server";
 
-import { ConvexError } from "convex/values";
-import { z } from "zod";
-
 import GitHub from "@auth/core/providers/github";
 import { Password } from "@convex-dev/auth/providers/Password";
 import { convexAuth } from "@convex-dev/auth/server";
+import { ConvexError } from "convex/values";
+import { z } from "zod";
 
 import { otpPasswordReset, otpVerificationEmail } from "./otp";
 
@@ -41,18 +40,10 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 
 				const raw: any = params;
 				const image: string | undefined =
-					typeof raw.avatar_url === "string"
-						? raw.avatar_url
-						: typeof raw.picture === "string"
-							? raw.picture
-							: undefined;
+					typeof raw.avatar_url === "string" ? raw.avatar_url : typeof raw.picture === "string" ? raw.picture : undefined;
 
 				const name: string | undefined =
-					typeof raw.name === "string" && raw.name.trim()
-						? raw.name
-						: typeof raw.login === "string"
-							? raw.login
-							: undefined;
+					typeof raw.name === "string" && raw.name.trim() ? raw.name : typeof raw.login === "string" ? raw.login : undefined;
 
 				return {
 					id: String(params.id),
@@ -99,12 +90,9 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 				.withIndex("email", (q) => q.eq("email", normalizedEmail))
 				.first();
 
-			const image: string | undefined =
-				typeof args.profile.image === "string" ? args.profile.image : undefined;
+			const image: string | undefined = typeof args.profile.image === "string" ? args.profile.image : undefined;
 			const name: string | undefined =
-				typeof args.profile.name === "string" && args.profile.name.trim()
-					? args.profile.name.trim()
-					: undefined;
+				typeof args.profile.name === "string" && args.profile.name.trim() ? args.profile.name.trim() : undefined;
 
 			if (existingUser) {
 				const currentProviders = existingUser.linkedProviders || [];
