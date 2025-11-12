@@ -141,17 +141,17 @@ npm run dev
 
 ## 📱 Halaman & Routing
 
-| Route                | Halaman              | Deskripsi                                                                 |
-| -------------------- | -------------------- | ------------------------------------------------------------------------- |
-| `/`                  | Beranda              | Halaman utama                                                             |
-| `/login`             | Login                | Form masuk; jika sudah login → redirect ke `/pahlawan`                    |
-| `/register`          | Daftar               | Form pendaftaran; jika sudah login → redirect ke `/pahlawan`              |
-| `/forgot-password`   | Lupa Kata Sandi      | Kirim kode reset; jika sudah login → redirect ke `/pahlawan`              |
-| `/verify-email`      | Verifikasi Email     | Verifikasi email via kode; baca `?email=`                                  |
-| `/reset-password`    | Reset Kata Sandi     | Reset kata sandi via kode; baca `?email=`                                  |
-| `/pahlawan`          | Dasbor               | Katalog pahlawan (protected; jika belum login → redirect ke `/login`)     |
-| `/pahlawan/:slug`    | Detail Pahlawan      | Info lengkap pahlawan (protected; jika belum login → redirect ke `/login`) |
-| (modal di halaman)   | Kuis / Poin          | Kuis dan riwayat poin ditampilkan melalui antarmuka                        |
+| Route              | Halaman          | Deskripsi                                                                  |
+| ------------------ | ---------------- | -------------------------------------------------------------------------- |
+| `/`                | Beranda          | Halaman utama                                                              |
+| `/login`           | Login            | Form masuk; jika sudah login → redirect ke `/pahlawan`                     |
+| `/register`        | Daftar           | Form pendaftaran; jika sudah login → redirect ke `/pahlawan`               |
+| `/forgot-password` | Lupa Kata Sandi  | Kirim kode reset; jika sudah login → redirect ke `/pahlawan`               |
+| `/verify-email`    | Verifikasi Email | Verifikasi email via kode; baca `?email=`                                  |
+| `/reset-password`  | Reset Kata Sandi | Reset kata sandi via kode; baca `?email=`                                  |
+| `/pahlawan`        | Dasbor           | Katalog pahlawan (protected; jika belum login → redirect ke `/login`)      |
+| `/pahlawan/:slug`  | Detail Pahlawan  | Info lengkap pahlawan (protected; jika belum login → redirect ke `/login`) |
+| (modal di halaman) | Kuis / Poin      | Kuis dan riwayat poin ditampilkan melalui antarmuka                        |
 
 Catatan routing & guard:
 
@@ -198,10 +198,10 @@ import { Resend as ResendAPI } from "resend";
 
 const resend = new ResendAPI(process.env.MAIL_API_KEY);
 await resend.emails.send({
-	from: "Mengenang Pahlawan <accounts@mengenangpahlawan.web.id>",
-	to: [email],
-	subject: "Verifikasi Email Anda",
-	react: VerificationEmail({ code, minutesUntilExpiry }),
+  from: "Mengenang Pahlawan <accounts@mengenangpahlawan.web.id>",
+  to: [email],
+  subject: "Verifikasi Email Anda",
+  react: VerificationEmail({ code, minutesUntilExpiry }),
 });
 ```
 
@@ -222,8 +222,8 @@ Contoh sederhana (lihat `convex/ai.ts`, `convex/agent.ts`):
 import { llm } from "./llm";
 
 const res = await llm.responses.create({
-	model: process.env.LLM_MODEL!,
-	input: "Ringkas biografi pahlawan berikut...",
+  model: process.env.LLM_MODEL!,
+  input: "Ringkas biografi pahlawan berikut...",
 } as any);
 ```
 

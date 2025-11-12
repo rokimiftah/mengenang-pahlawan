@@ -4,9 +4,9 @@ import { HeroDetail } from "@features/heroes";
 import { DashboardLayout } from "@pages/DashboardPage";
 
 export default function HeroDetailPage() {
-	return (
-		<DashboardLayout>
-			<HeroDetail />
-		</DashboardLayout>
-	);
+  return (
+    <DashboardLayout>
+      <HeroDetail />
+    </DashboardLayout>
+  );
 }

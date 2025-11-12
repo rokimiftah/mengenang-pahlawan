@@ -5,13 +5,13 @@ import { MantineProvider } from "@mantine/core";
 import { ConvexReactClient } from "convex/react";
 
 const convex = new ConvexReactClient(import.meta.env.PUBLIC_CONVEX_URL, {
-	logger: false,
+  logger: false,
 });
 
 export function AppProviders({ children }: { children: ReactNode }) {
-	return (
-		<MantineProvider forceColorScheme="dark">
-			<ConvexAuthProvider client={convex}>{children}</ConvexAuthProvider>
-		</MantineProvider>
-	);
+  return (
+    <MantineProvider forceColorScheme="dark">
+      <ConvexAuthProvider client={convex}>{children}</ConvexAuthProvider>
+    </MantineProvider>
+  );
 }
